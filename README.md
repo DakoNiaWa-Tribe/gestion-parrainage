@@ -8,3 +8,5 @@ L’enregistrement et la gestion des candidats 📑.
 L’ouverture et la clôture de la période de parrainage 🚪.
 L’inscription des électeurs et la validation des parrainages ❇️.
 Le suivi des parrainages via un tableau de bord ↝.
+
+Almoustapha
