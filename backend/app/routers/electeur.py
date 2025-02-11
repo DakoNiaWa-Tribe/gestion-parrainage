@@ -1,7 +1,5 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, APIRouter, Form
-import csv
-from io import StringIO
-import hashlib
+from fastapi import File, UploadFile, HTTPException, APIRouter, Form, Request
+from app.Database import connectionDb
 
 
 electeurData = [
@@ -21,40 +19,51 @@ electeurData = [
 
 router = APIRouter()
 
+def controler_fichier_db(userId, ipAdresse, fileCheckSum, fileContent):
+    try:
+        conn = connectionDb()
+        cursor = conn.cursor()
+
+        result = None
+        errorMessage = None
+
+        cursor.execute( """ SELECT ControlerFichierElecteurs(%s, %s, %s, %s)""",
+                       (userId, ipAdresse, fileCheckSum, fileContent))
+        
+        result = cursor.fetchone()[0]
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as error:
+        print(error)
+        raise HTTPException(status_code=500, detail="Cannot proceed")
+
+    return result 
+
+
+@router.post('/electeur/upload_csv/')
+async def electeur_upload_csv(
+    request: Request,
+    file: UploadFile=File(...), 
+    checksum: str = Form(...),
+    userId: int = Form(...)
+    ):
+
+    if file.content_type != "text/csv":
+        raise HTTPException(status_code=400, detail={"error": "invalid file type"})
+    
+    ipAdress = request.client.host
+    contents = await file.read()
+
+    isValid = controler_fichier_db(userId, ipAdress, checksum, contents)
+
+    if not isValid:
+        raise HTTPException(status_code=400, detail="echec: fichier altere ou encodage incorrect")
+    
+    return {"message": "Fichier accepte et en attente de validation"}
+
+
 @router.get('/electeur/get_electeur')
 def get_electeur():
     return electeurData
-
-@router.post('/electeur/upload_csv/')
-async def electeur_upload_csv(file: UploadFile=File(...), checksum: str = Form(...)):
-    if file.content_type != "text/csv":
-        return {"error": "invalid file type"}
-    
-    try:
-        contents = await file.read()
-        decoded_contents = contents.decode("UTF-8")
-
-        recalculated_sum = hashlib.sha256(contents).hexdigest()
-        print(recalculated_sum)
-
-        if(recalculated_sum != checksum):
-            raise HTTPException(
-                status_code=400,
-                detail="Le fichier a ete altere"
-            )
-        
-    except UnicodeDecodeError:
-        raise HTTPException(
-            status_code=400, 
-            detail="le fichier n'est pas en UTF-8!")
-
-    csv_reader = csv.reader(StringIO(decoded_contents))
-    rows = []
-
-    for row in csv_reader:
-        rows.append(row)
-
-    return {
-        "filename": file.filename, 
-        "rows": rows
-    }
