@@ -73,9 +73,9 @@ CREATE TABLE periode_parrainage (
     etat ENUM('ouvert', 'ferme') DEFAULT 'ferme'
 );
 
--- creation ControlleFichierElecteur
 
-DELIMITER $$
+
+-- fonction ControlleFichierElecteur
 
 DELIMITER $$
 
@@ -115,3 +115,82 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-- table des erreurs sur les electeurs
+
+CREATE TABLE IF NOT EXISTS electeurs_problemes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tentative_id INT, -- L'identifiant de l'upload
+    cni VARCHAR(20),
+    numero_electeur VARCHAR(20),
+    erreur_description TEXT,
+    date_detection TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- fonction ControlerElecteur
+
+DELIMITER $$
+
+CREATE FUNCTION ControlerElecteurs(
+    p_tentativeId INT,
+    p_numCni VARCHAR(20),
+    p_numElecteur VARCHAR(20),
+    p_nom VARCHAR(100),
+    p_prenom VARCHAR(100),
+    p_dateNaissance DATE,
+    p_lieuNaissance VARCHAR(100),
+    p_sexe CHAR(1)
+)RETURNS TINYINT(1)
+
+DETERMINISTIC
+BEGIN
+    DECLARE v_errorMessage TEXT DEFAULT '';
+    DECLARE v_countCni INT;
+    DECLARE v_countNumElec INT;
+-- numero cni invalide
+    IF LENGTH(p_numCni) <> 17 OR p_numCni NOT REGEXP '^[0-9]+$' THEN
+        SET v_errorMessage = CONCAT(v_errorMessage, 'CNI Invalide. ');
+    END IF;
+-- numero electeur invalide
+    IF LENGTH(p_numElecteur)  <> 9 OR p_numElecteur NOT REGEXP '^[0-9]+$' THEN
+        SET v_errorMessage = CONCAT(v_errorMessage, 'Numero Electeur invalide. ');
+    END IF;
+-- on verifie l'unicite du CNI et du numero electeur
+    SELECT COUNT(*) INTO v_countCni FROM electeurs WHERE cin = p_numCni ;
+    IF v_countCni > 0 THEN
+        SET v_errorMessage = CONCAT(v_errorMessage, 'CNI deja Utilise. ');
+    END IF;
+
+
+    SELECT COUNT(*) INTO v_countNumElec FROM electeurs WHERE numero_electeur = p_numElecteur;
+    IF v_countNumElec > 0 THEN
+        SET v_errorMessage = CONCAT(v_errorMessage, 'numero electeur deja Utilise. ');
+    END IF;
+
+-- on verifie les champs obligatoires
+    IF p_nom IS NULL OR p_nom = '' OR p_prenom IS NULL OR p_prenom = '' OR p_dateNaissance IS NULL OR
+        p_lieuNaissance IS NULL OR p_lieuNaissance = '' OR p_sexe NOT IN ('M', 'F') THEN
+        SET v_errorMessage = CONCAT(v_errorMessage, 'Informations incompletes. ');
+    END IF;
+
+-- on verifie que les champs de texte ne contiennent pas d'accent et sont en utf-8
+    IF p_nom REGEXP '[À-ÖØ-öø-ÿ]' OR p_prenom REGEXP '[À-ÖØ-öø-ÿ]' or p_lieuNaissance REGEXP '[À-ÖØ-öø-ÿ]' THEN
+        SET v_errorMessage = CONCAT(v_errorMessage, 'Caractere Speciaux non autorise. ');
+    END IF;
+
+    IF v_errorMessage <> '' THEN
+        INSERT INTO electeurs_problemes(tentative_id, cni, numero_electeur, erreur_description)
+        VALUES(p_tentativeId, p_numCni, p_numElecteur, v_errorMessage);
+
+        RETURN 0;
+    END IF;
+
+    RETURN 1;
+END $$
+DELIMITER ;
+
+
+
+
+
