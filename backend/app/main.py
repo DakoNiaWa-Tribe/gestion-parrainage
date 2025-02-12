@@ -1,9 +1,10 @@
 from fastapi import FastAPI
-from .routers import electeur, admin
+from .routers import electeur, admin, candidat
 
 app = FastAPI()
 
 app.include_router(admin.router)
+app.include_router(candidat.router)
 
 
 @app.get('/')
