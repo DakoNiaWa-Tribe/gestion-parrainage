@@ -1,7 +1,7 @@
 CREATE TABLE electeurs (
     id INT PRIMARY KEY AUTO_INCREMENT,
     numero_electeur VARCHAR(20) UNIQUE NOT NULL,
-    cin VARCHAR(15) UNIQUE NOT NULL,
+    cni VARCHAR(20) UNIQUE NOT NULL,
     nom VARCHAR(100) NOT NULL,
     prenom VARCHAR(100) NOT NULL,
     date_naissance DATE NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE electeurs (
 CREATE TABLE temp_electeurs (
     id INT PRIMARY KEY AUTO_INCREMENT,
     numero_electeur VARCHAR(20),
-    cin VARCHAR(15),
+    cni VARCHAR(20),
     nom VARCHAR(100),
     prenom VARCHAR(100),
     date_naissance DATE,
@@ -157,7 +157,7 @@ BEGIN
         SET v_errorMessage = CONCAT(v_errorMessage, 'Numero Electeur invalide. ');
     END IF;
 -- on verifie l'unicite du CNI et du numero electeur
-    SELECT COUNT(*) INTO v_countCni FROM electeurs WHERE cin = p_numCni ;
+    SELECT COUNT(*) INTO v_countCni FROM electeurs WHERE cni = p_numCni ;
     IF v_countCni > 0 THEN
         SET v_errorMessage = CONCAT(v_errorMessage, 'CNI deja Utilise. ');
     END IF;
@@ -190,7 +190,28 @@ BEGIN
 END $$
 DELIMITER ;
 
+-- validerImportation procedure
+
+DELIMITER $$
+
+CREATE PROCEDURE ValiderImportation()
+BEGIN
+    INSERT INTO electeurs (numero_electeur, cni, nom, prenom, date_naissance, lieu_naissance, sexe, bureau_vote)
+    SELECT numero_electeur, cni,nom, prenom, date_naissance, lieu_naissance, sexe, bureau_vote
+    FROM temp_electeurs;
+
+    DELETE FROM temp_electeurs;
+
+    UPDATE etat_import SET etat_upload_electeurs = 0;
+END $$
+
+DELIMITER ;
 
 
+-- table etat import
 
-
+CREATE TABLE etat_import (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    etat_upload_electeurs TINYINT NOT NULL DEFAULT 1,  -- 1 = Upload allowed, 0 = Upload blocked
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
