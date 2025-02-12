@@ -1,17 +1,26 @@
 
 import './App.css'
-import Layout from '../component/body'
-import CardForm from '../component/cardform'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import Accueil from './pages/Accueil'
+import Login from './pages/login'
+
+
+
 function App() {
 
+  const router= createBrowserRouter([
 
-  return (
-    <>
-      <Layout>
-          <CardForm/>
-      </Layout>
-    </>
-  )
+    {
+      path:'/',
+      element: <Accueil/>
+    },
+    {
+      path: '/login',
+      element: <Login/>
+    }
+  ])
+
+  return <RouterProvider router={router}/>
 }
 
 export default App
