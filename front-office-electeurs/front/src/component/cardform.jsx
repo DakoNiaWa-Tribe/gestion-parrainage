@@ -1,49 +1,57 @@
+/* eslint-disable react/prop-types */
 
 import { useState, useRef, useEffect } from "react";
 import anime from "animejs";
 
-const CardForm = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
-  const cardRef = useRef(null);
-  const Zoomref = useRef(null);
- 
 
+
+const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part}) => {
   
-    useEffect(() => {
-      anime({
-        targets: Zoomref.current, // Cible la div référencée
-        opacity: 1,
-        scale: 1.05,
-        duration: 1000,
-        delay: 1600, // Durée de l'animation 
-        easing: 'easeInOutQuad', // Animation fluide
-      });
-    }, []);
+  const [loading, setLoading] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState(''); // 'success' ou 'error'
 
-  const handleToggleClick = () => {
-    setIsSignUp(!isSignUp)
-    anime({
-      targets: cardRef.current,
-      rotateY: isSignUp ? 0 : 180,
-      easing: "easeInOutQuad",
-      duration: 1000,
-    });
+  // Simulation de l'inscription
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setAlertMessage('');
+
+    console.log(Part)
+
+    
+    // Simulation d'une requête à l'API
+    setTimeout(() => {
+      const success = Math.random() > 0.5; // Random pour simuler succès/échec
+      if (success) {
+          setPart(!Part)
+
+        setAlertMessage('Erreur lors de l\'inscription. Veuillez réessayer.');
+      } else {
+        setAlertMessage('Erreur lors de l\'inscription. Veuillez réessayer.');
+        setAlertType('error');
+      }
+      setLoading(false);
+
+      // Animation d'apparition de l'alerte
+      anime({
+        targets: '#alert-box',
+        opacity: [0, 1],
+        translateY: [-20, 0],
+        duration: 8000,
+        easing: 'easeOutExpo',
+      });
+    }, 2000); // Simulation d'un délai de 2s
   };
+
 
   return (
 
-<div 
-  ref={Zoomref}
-  className="flex flex-col  flex-1 justify-center items-center opacity-0">
-
-      <div
-        ref={cardRef}
-        className="relative w-96 min-h-[450px]  perspective-1000 "
-        style={{ perspective: "1000px", transformStyle: "preserve-3d",  }}
-      >
-        {/* Login Form */}
-        <div
-          className={`absolute w-full min-h-full  p-6 bg-white rounded-xl shadow-xl transition-opacity   ${
+        <>
+         {/* Login Form */}
+         <div
+          ref={formRef}
+          className={`absolute w-full min-h-3/4  p-6 bg-white rounded-xl shadow-xl transition-opacity   ${
             isSignUp ? "opacity-0 pointer-events-none duration-800 delay-200" : "opacity-100 delay-200 duration-1000"
           }`}
         >
@@ -60,55 +68,135 @@ const CardForm = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-600 text-sm mb-1">Password</label>
+              <label className="block text-gray-600 text-sm mb-1">Code d&apos;authenfication</label>
               <input
                 type="password"
                 className="w-full p-2 rounded border border-gray-300"
               />
             </div>
-            <button className="bg-blue-600 text-white w-full p-2 rounded mt-3">
+            <button className="bg-blue-600 text-white w-full p-2 rounded mt-3 cursor-pointer">
               Connexion
             </button>
             <button
               type="button"
               onClick={handleToggleClick}
-              className="mt-3 text-blue-500 text-sm text-center"
+              className="mt-3 text-blue-500 text-sm text-center cursor-pointer"
             >
               Pas encore de compte ? Inscrivez-vous
             </button>
           </form>
         </div>
-
         {/* Signup Form */}
         <div
-          className={`absolute w-full min-h-full  p-6 bg-white rounded-xl shadow-xl transition-opacity  ${
-            isSignUp ? "opacity-100 delay-200 duration-1000" : "opacity-0 pointer-events-none  duration-600 delay-200"
+        ref={formRef}
+      className={`absolute w-full min-h-full p-6 bg-white rounded-xl shadow-xl transition-opacity ${
+        isSignUp
+          ? 'opacity-100 delay-200 duration-1000'
+          : 'opacity-0 pointer-events-none duration-600 delay-200'
+      }`}
+      style={{ transform: 'rotateY(180deg)' }}
+    >
+      <div className="h-15 flex justify-center">
+        <img src="img/logo.png" alt="Logo" className="w-15 h-15" />
+      </div>
+      <h2 className="text-2xl mb-4 text-center text-gray-800">Inscription</h2>
+
+      {/* Alerte stylée */}
+      {alertMessage && (
+        <div
+          id="alert-box"
+          className={`p-3 rounded-lg mb-4 ${
+            alertType === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
           }`}
-          style={{ transform: "rotateY(180deg)" }}
+        >
+          {alertMessage}
+        </div>
+      )}
+
+      <form className="flex flex-col gap-3" onSubmit={handleSignup}>
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">Nom de famille</label>
+          <input
+            type="text"
+            className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300"
+          />
+        </div>
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">Numéro de carte d’identité nationale</label>
+          <input
+            type="text"
+            className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300"
+          />
+        </div>
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">Numéro de carte d’électeur</label>
+          <input
+            type="text"
+            className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300"
+          />
+        </div>
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">Numéro du bureau de vote</label>
+          <input
+            type="password"
+            className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300"
+          />
+        </div>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white w-full p-2 rounded mt-3 flex items-center justify-center cursor-pointer"
+          disabled={loading}
+        >
+          {loading ? (
+            <span className="animate-spin rounded-full h-5 w-5 border-t-2 border-white border-solid "></span>
+          ) : (
+            "S'inscrire"
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={handleToggleClick}
+          className="mt-3 text-blue-500 text-sm text-center cursor-pointer"
+        >
+          Déjà un compte ? Connectez-vous
+        </button>
+      </form>
+    </div>
+
+    
+   
+        </>
+  );
+};
+
+const Postinscription = ({formRef}) => {
+ 
+
+  return (
+
+        <>
+        {/* Signup Form */}
+        <div
+          ref={formRef}
+          className={`absolute w-full min-h-full  p-6 bg-white rounded-xl shadow-xl transition-opacity rotate-y-180`}
         >
             <div className="h-15 flex justify-center"> 
                     <img src="img/logo.png" alt="" className="w-15 h-15" />       
             </div>
           <h2 className="text-2xl mb-4 text-center text-gray-800">Inscription</h2>
           <form className="flex flex-col gap-3">
-            <div>
-              <label className="block text-gray-600 text-sm mb-1">Nom</label>
-              <input
-                type="text"
-                className="w-full p-2 rounded border border-gray-300"
-              />
-            </div>
+          
             <div>
               <label className="block text-gray-600 text-sm mb-1">Email</label>
               <input
                 type="text"
                 className="w-full p-2 rounded border border-gray-300"
               />
-            </div>
+            </div> 
             <div>
-              <label className="block text-gray-600 text-sm mb-1">Password</label>
+              <label className="block text-gray-600 text-sm mb-1">Numéro de telephone</label>
               <input
-                type="password"
+                type="text"
                 className="w-full p-2 rounded border border-gray-300"
               />
             </div>
@@ -117,16 +205,80 @@ const CardForm = () => {
             </button>
             <button
               type="button"
-              onClick={handleToggleClick}
               className="mt-3 text-blue-500 text-sm text-center"
             >
-              Déjà un compte ? Connectez-vous
             </button>
           </form>
         </div>
+   
+        </>
+  );
+};
+
+
+const CardForm = () => {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [part, setPart] = useState(true);
+  const cardRef = useRef(null);
+  const Zoomref = useRef(null);
+  const formRef = useRef(null);
+
+ 
+
+  
+    useEffect(() => {
+      anime({
+        targets: Zoomref.current, // Cible la div référencée
+        opacity: 1,
+        scale: [0.95,1],
+        duration: 1000,
+        delay: 1600, // Durée de l'animation 
+        easing: 'easeInOutQuad', // Animation fluide
+      });
+    }, []);
+
+  const handleToggleClick = () => {
+    setIsSignUp(!isSignUp)
+    anime({
+      targets: cardRef.current,
+      rotateY: isSignUp ? 0 : 180,
+      easing: "easeInOutQuad",
+      duration: 1000,
+    });
+  };
+  useEffect(() => {
+    if (formRef.current && cardRef.current) {
+      // Récupérer la hauteur de l'enfant visible
+      const formHeight = formRef.current.offsetHeight;
+      cardRef.current.style.height = `${formHeight}px`;
+      console.log(formRef.current.offsetHeight);
+    }
+  }, [isSignUp]);
+
+  return (
+
+<div 
+  ref={Zoomref}
+  className="flex flex-col  flex-1 min-h-auto justify-center items-center opacity-0">
+
+      <div
+        ref={cardRef}
+        className="relative w-96 min-h-[450px] flex items-center  perspective-1000 "
+        style={{ perspective: "1000px", transformStyle: "preserve-3d",  }}
+      >
+
+        {part ? (
+          <Preinscription isSignUp={isSignUp} handleToggleClick={handleToggleClick} formRef={formRef} setPart={setPart} Part={part} />
+        ) : (
+          <Postinscription formRef={formRef} />
+        )}
+         
       </div>
     </div>
   );
 };
 
+
 export default CardForm ;
+
+
