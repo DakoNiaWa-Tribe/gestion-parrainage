@@ -3,91 +3,12 @@ import mysql.connector
 from app.database import connectionDb
 import mysql
 import csv
+from app.controllers import admin
 
 
-router = APIRouter()
+router = APIRouter(prefix="/admin", tags=["Admin"])
 
-def controler_fichier_db(userId, ipAdresse, fileCheckSum, fileContent):
-    try:
-        conn = connectionDb()
-        cursor = conn.cursor()
 
-        result = None
-        errorMessage = None
-
-        cursor.execute( """ SELECT ControlerFichierElecteurs(%s, %s, %s, %s)""",
-                       (userId, ipAdresse, fileCheckSum, fileContent))
-        
-        result = cursor.fetchone()[0]
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-    except Exception as error:
-        print(error)
-        raise HTTPException(status_code=500, detail="Cannot proceed")
-
-    return result 
-
-def controlerElecteur():
-    try:
-        conn = connectionDb()
-        cursor = conn.cursor()
-
-        # Sélectionner les enregistrements de la table temp_electeurs
-        cursor.execute(""" 
-            SELECT cni, numero_electeur, nom, prenom, date_naissance, lieu_naissance, sexe
-            FROM temp_electeurs
-        """)
-        records = cursor.fetchall()
-        cursor.execute("""
-        SELECT COUNT(*) from uploads 
-    """)
-        uploadAttemps = cursor.fetchone()[0]
-        print(uploadAttemps)
-        cursor.execute("""
-        SELECT COUNT(*) from temp_electeurs 
-    """)
-        tempElecteurCount =  cursor.fetchone()[0]
-
-        if tempElecteurCount <= 0 :
-            return 0
-
-        for record in records:
-            num_cni, num_electeur, nom, prenom, date_naissance, lieu_naissance, sexe = record
-
-            cursor.execute(
-                """
-                SELECT ControlerElecteurs(%s ,%s, %s, %s, %s, %s, %s, %s)
-            """, (uploadAttemps, num_cni, num_electeur, nom, prenom, date_naissance, lieu_naissance, sexe))
-            
-            result = cursor.fetchone()[0]
-
-            # Si la fonction retourne 0, retourner 0 immédiatement
-            if result == 0:
-                cursor.close()
-                conn.close()
-                return 0
-
-        cursor.close()
-        conn.close()
-        return 1
-
-    except mysql.connector.Error as error:
-        print(f"Erreur MySQL: {error}")
-        raise HTTPException(status_code=500, detail="Unexcepted error")
-
-def validerImportation():
-    try:
-        conn = connectionDb()
-        cursor = conn.cursor()
-
-        cursor.execute("CALL ValiderImportation")
-        conn.commit()
-        conn.close()
-
-    except mysql.connector.Error as error:
-        print(error)
 
 @router.post('/admin/upload_electeur_csv/')
 async def electeur_upload_csv(
@@ -98,15 +19,19 @@ async def electeur_upload_csv(
     ):
     try:
         conn = connectionDb()
-        print(conn)
         if conn:
             cursor = conn.cursor()
 
         cursor.execute("""
             SELECT etat_upload_electeurs from etat_import
         """)
-        etatUpload = cursor.fetchone()[0]
-        print(etatUpload)
+        etatUpload = cursor.fetchone()
+
+
+        if etatUpload is None:
+            raise HTTPException(status_code=400, detail="Aucune donnée trouvée pour etat_upload_electeurs")
+
+        etatUpload = etatUpload[0]
 
         if(etatUpload == 0): 
            return HTTPException(
@@ -123,7 +48,7 @@ async def electeur_upload_csv(
         ipAdress = request.client.host
         contents = await file.read()
 
-        isValid = controler_fichier_db(userId, ipAdress, checksum, contents)
+        isValid = admin.controler_fichier_db(userId, ipAdress, checksum, contents)
         if not isValid:
             raise HTTPException(status_code=400, detail="echec: fichier altere ou encodage incorrect")
 
@@ -156,7 +81,7 @@ async def electeur_upload_csv(
 
 
 @router.post("/admin/controler_electeurs")
-def controler_electeur(request: Request):
+async def controler_electeur(request: Request):
     try:
         conn = connectionDb()
         print(conn)
@@ -175,7 +100,7 @@ def controler_electeur(request: Request):
                 detail="Les uploads sont actuellement bloqués. Veuillez contacter l'administrateur."
                 )
 
-        isValid = controlerElecteur()
+        isValid = await admin.controlerElecteur()
         print(isValid)
         if isValid == 0:
             raise HTTPException(status_code=403, detail={"erreur":"tous les electeurs ne sont pas valides"})
@@ -215,7 +140,7 @@ async def valider_importation():
                 detail="Les uploads sont actuellement bloqués. Veuillez contacter l'administrateur."
                 )
         
-        validerImportation()
+        admin.validerImportation()
         conn.commit()
         cursor.close
         conn.close()
