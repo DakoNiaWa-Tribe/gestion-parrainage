@@ -1,0 +1,36 @@
+.partiColors{
+    display: flex;
+    width: 180px;
+    height: 90px;
+}
+
+.couleur{
+    flex: 1;
+    height: 100%;
+}
+
+.vert{
+    background-color: green;
+}
+.jaune{
+    background-color: yellow;
+}
+
+.rouge{
+    background-color: red;
+}
+
+.noir{
+    background-color: black;
+}
+
+.blanc{
+    background-color: white;
+}
+
+.candidat{
+    box-sizing: border-box;
+    margin: 20px auto;
+    padding: 10px 30px;
+    box-shadow: gray 2px 2px 10px;
+}
