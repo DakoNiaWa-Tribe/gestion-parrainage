@@ -2,7 +2,9 @@ from fastapi import HTTPException, status, BackgroundTasks
 from fastapi.responses import JSONResponse
 from app.database import connectionDb
 from app.models.electeur import ElecteurCheckResponse, ElecteurRegistration
-from app.utils import send_sms #, send_email
+# from app.utils import send_sms #, send_email
+
+
 async def parrain_registration(data: ElecteurCheckResponse):
     conn = connectionDb()
     cursor = conn.cursor()
@@ -14,7 +16,7 @@ async def parrain_registration(data: ElecteurCheckResponse):
         validoupas = cursor.fetchone()
 
         if validoupas is None:
-            raise HTTPException(status_code=400, detail="Vous ne figurez pas sur la liste des électeurs. KITT ICI")
+            raise HTTPException(status_code=400, detail="Vous ne figurez pas sur la liste des électeurs.")
 
         cursor.execute("""
             INSERT INTO parrain_electeurs (cni, numero_electeur, nom, bureau_vote) 
@@ -59,7 +61,7 @@ async def electeur_registration(data: ElecteurRegistration, background_tasks: Ba
         """, (data.numero_tel, data.adresse_mail, data.numero_id_national))
         conn.commit()
 
-        background_tasks.add_task(send_sms, data.numero_tel, "Votre inscription est confirmée.")
+        # background_tasks.add_task(send_sms, data.numero_tel, "Votre inscription est confirmée.")
         #background_tasks.add_task(send_email, data.adresse_mail, "Confirmation d'inscription", "Votre inscription est réussie.")
 
     except Exception as e:

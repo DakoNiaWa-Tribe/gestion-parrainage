@@ -58,55 +58,55 @@ def regeneratCode(numeroElecteur):
         return False
 
 
-# def getAllCandidat():
-#     try:
-#         conn = connectionDb()
-#         cursor = conn.cursor()
+def getAllCandidat():
+    try:
+        conn = connectionDb()
+        cursor = conn.cursor()
 
-#         cursor.execute("""
-#             SELECT * FROM candidats
-#         """)
+        cursor.execute("""
+            SELECT * FROM candidats
+        """)
 
-#         result = cursor.fetchall()
+        result = cursor.fetchall()
 
-#         candidats = []
-#         for row in result:
-#             candidat = {
-#                 "numero_electeur": row[0],
-#                 "nom": row[1],
-#                 "prenom": row[2],
-#                 "date_naissance": row[3],
-#                 "email": row[4],
-#                 "telephone": row[5],
-#                 "parti_politique": row[6],
-#                 "slogan": row[7],
-#                 "photo_url": row[8],  # This should match the photo field in your DB schema
-#                 "couleur_parti_1": row[9],
-#                 "page_info_url": row[10],
-#                 "code_securite": row[11],
-#                 "couleur_parti_2": row[12],
-#                 "couleur_parti_3": row[13]
-#             }
+        candidats = []
+        for row in result:
+            candidat = {
+                "numero_electeur": row[0],
+                "nom": row[1],
+                "prenom": row[2],
+                "date_naissance": row[3],
+                "email": row[4],
+                "telephone": row[5],
+                "parti_politique": row[6],
+                "slogan": row[7],
+                "photo_url": row[8],  # This should match the photo field in your DB schema
+                "couleur_parti_1": row[9],
+                "page_info_url": row[10],
+                "code_securite": row[11],
+                "couleur_parti_2": row[12],
+                "couleur_parti_3": row[13]
+            }
 
-#             # Read the photo file and encode it in base64
-#             photo_path = os.path.join("uploads", row[8])  # Corrected index
-#             if os.path.exists(photo_path):
-#                 with open(photo_path, "rb") as photo_file:
-#                     candidat["photo"] = base64.b64encode(photo_file.read()).decode('utf-8')
-#             else:
-#                 candidat["photo"] = None
+            # Read the photo file and encode it in base64
+            photo_path = os.path.join("uploads", row[8])  # Corrected index
+            if os.path.exists(photo_path):
+                with open(photo_path, "rb") as photo_file:
+                    candidat["photo"] = base64.b64encode(photo_file.read()).decode('utf-8')
+            else:
+                candidat["photo"] = None
 
-#             candidats.append(candidat)
+            candidats.append(candidat)
 
-#         return candidats
-#     except Exception as error:
-#         print(f"Erreur: {error}")
-#         return None
-#     finally:
-#         if cursor:
-#             cursor.close()
-#         if conn:
-#             conn.close()
+        return candidats
+    except Exception as error:
+        print(f"Erreur: {error}")
+        return None
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 def checkElecteurCheckRequesCandidat(numeroElecteur: str):
     try:

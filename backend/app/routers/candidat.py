@@ -90,7 +90,6 @@ def get_all_candidat():
                 "Message": "Pas de candidat enregistrer pour le moment",
                 "status_code": status.HTTP_404_NOT_FOUND
             }
-        print(result)
         
         return {
             "message": "Liste des candidats",
