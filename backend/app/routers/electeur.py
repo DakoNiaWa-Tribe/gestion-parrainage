@@ -27,9 +27,6 @@ async def parrain_registration(data: ElecteurCheckResponse):
         """, (data.numero_id_national, data.numero_electeur, data.nom_famille, data.numero_bureau))
         conn.commit()
 
-        cursor.execute("INSERT INTO contact_parrain (cni) VALUES (%s)", (data.numero_id_national,))
-        conn.commit()
-
     except Exception as e:
         print(f"Erreur : {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Erreur interne du serveur")
@@ -41,27 +38,27 @@ async def parrain_registration(data: ElecteurCheckResponse):
     return {"message": "Vous avez été enregistré comme parrain"}, status.HTTP_200_OK
 
 
-@router.post("/electeur-registration/")
-async def electeur_registration(data: ElecteurRegistration, background_tasks: BackgroundTasks):
+@router.post("/confirmation_parrain_registration/")
+async def confirmation_parrain_registration(data: ElecteurRegistration, background_tasks: BackgroundTasks):
     """Route pour enregistrer un électeur et lui envoyer un email et un SMS."""
     conn = connectionDb()
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT * FROM contact_parrain WHERE cni = %s", (data.numero_id_national,))
-        if cursor.fetchone():
-            return {"message": "Vous figurez déjà sur la liste."}, status.HTTP_400_BAD_REQUEST
+        cursor.execute("SELECT * FROM parrain_electeurs WHERE cni = %s", (data.numero_id_national,))
+        if cursor.fetchone() is None:
+            return {"message": "Vous ne figurez pas sur la liste."}, status.HTTP_400_BAD_REQUEST
         
-        cursor.execute("SELECT * FROM contact_parrain WHERE numero_tel = %s", (data.numero_tel,))
+        cursor.execute("SELECT * FROM parrain_electeurs WHERE numero_tel = %s", (data.numero_tel,))
         if cursor.fetchone():
             return {"message": "Numéro de téléphone déjà utilisé."}, status.HTTP_400_BAD_REQUEST
         
-        cursor.execute("SELECT * FROM contact_parrain WHERE email = %s", (data.adresse_mail,))
+        cursor.execute("SELECT * FROM parrain_electeurs WHERE email = %s", (data.adresse_mail,))
         if cursor.fetchone():
             return {"message": "Email déjà utilisé."}, status.HTTP_400_BAD_REQUEST
 
         cursor.execute("""
-            UPDATE contact_parrain 
+            UPDATE parrain_electeurs 
             SET numero_tel = %s, email = %s 
             WHERE cni = %s
         """, (data.numero_tel, data.adresse_mail, data.numero_id_national))

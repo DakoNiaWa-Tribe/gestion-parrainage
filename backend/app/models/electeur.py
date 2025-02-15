@@ -7,6 +7,8 @@ class ElecteurCheckResponse(BaseModel):
     numero_id_national: str
     nom_famille: str
     numero_bureau: str
+    numero_tel: Optional[str]=None
+    adresse_mail: Optional[str]=None
 
 class ElecteurRegistration(BaseModel):
     numero_id_national: str
