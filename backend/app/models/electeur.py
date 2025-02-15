@@ -3,14 +3,15 @@ from pydantic import BaseModel
 from datetime import date
 
 class ElecteurCheckResponse(BaseModel):
-    numero_electeur = str
-    numero_id_national = str
-    nom_famille = str
-    numero_bureau = str
+    numero_electeur: str
+    numero_id_national: str
+    nom_famille: str
+    numero_bureau: str
 
 class ElecteurRegistration(BaseModel):
-    numero_tel = str
-    adresse_mail = str
+    numero_id_national: str
+    numero_tel: str
+    adresse_mail: str
 
 class SecurityResponseElecteur(BaseModel):
     code_securite: str

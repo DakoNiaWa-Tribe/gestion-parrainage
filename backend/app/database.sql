@@ -11,6 +11,22 @@ CREATE TABLE electeurs (
     date_enregistrement TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE parrain_electeurs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    numero_electeur VARCHAR(20) UNIQUE NOT NULL,
+    cni VARCHAR(20) UNIQUE NOT NULL,
+    nom VARCHAR(100) NOT NULL,
+    bureau_vote VARCHAR(100) NOT NULL,
+    date_enregistrement TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE contact_parrain(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    cni VARCHAR(20) UNIQUE NOT NULL,
+    numero_tel VARCHAR(20) UNIQUE,
+    email VARCHAR(100) UNIQUE
+);
+
 CREATE TABLE temp_electeurs (
     id INT PRIMARY KEY AUTO_INCREMENT,
     numero_electeur VARCHAR(20),
