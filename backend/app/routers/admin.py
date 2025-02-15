@@ -10,7 +10,7 @@ router = APIRouter(prefix="/admin", tags=["Admin"])
 
 
 
-@router.post('/admin/upload_electeur_csv/')
+@router.post('/upload_electeur_csv/')
 async def electeur_upload_csv(
     request: Request,
     file: UploadFile=File(...), 
@@ -80,7 +80,7 @@ async def electeur_upload_csv(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"message": "Veuillez verifier le fichier"})
 
 
-@router.post("/admin/controler_electeurs")
+@router.post("/controler_electeurs")
 async def controler_electeur(request: Request):
     try:
         conn = connectionDb()
@@ -120,7 +120,7 @@ async def controler_electeur(request: Request):
             )
 
 
-@router.post("/admin/valider_importation")
+@router.post("/valider_importation")
 async def valider_importation():
     try:
         conn = connectionDb()
