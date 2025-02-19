@@ -19,6 +19,7 @@ CREATE TABLE parrain_electeurs (
     bureau_vote VARCHAR(100) NOT NULL,
     numero_tel VARCHAR(20) UNIQUE,
     email VARCHAR(100) UNIQUE,
+    code_securite VARCHAR(15) UNIQUE,
     date_enregistrement TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

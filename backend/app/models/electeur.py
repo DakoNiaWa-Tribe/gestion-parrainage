@@ -7,8 +7,6 @@ class ElecteurCheckResponse(BaseModel):
     numero_id_national: str
     nom_famille: str
     numero_bureau: str
-    numero_tel: Optional[str]=None
-    adresse_mail: Optional[str]=None
 
 class ElecteurRegistration(BaseModel):
     numero_id_national: str
@@ -20,14 +18,14 @@ class SecurityResponseElecteur(BaseModel):
     numero_tel: str
     adress_mail: str
 
-# class Electeur(BaseModel):
-#     id: int
-#     numero_carte_elec: str
-#     numero_carte_identite: str
-#     nom: str
-#     numero_bureau: int
-#     numero_tel: str
-#     adresse_mail: str
-#     # has_voted: Optional[bool] 
+class ParrainerCandidatCheckRequest(BaseModel):
+    numero_electeur: str
+    numero_id_national: str
 
-
+class ParrainerCandidatAuth(BaseModel):
+    numero_electeur: str
+    numero_id_national: str
+    nom_famille: str
+    prenom: str
+    numero_bureau: str
+    code_securite: str

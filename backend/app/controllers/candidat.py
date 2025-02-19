@@ -7,12 +7,7 @@ from pathlib import Path
 import uuid
 import os
 import base64
-
-
-def generate_random_code(length=8):
-    characters = string.ascii_uppercase + string.digits
-    random_code = ''.join(random.choice(characters) for _ in range(length))
-    return random_code
+from app.utils.codeGeneration import generate_random_code
 
 async def savePhoto(photo: File):
     UPLOAD_DIR = "uploads"
@@ -38,7 +33,7 @@ async def savePhoto(photo: File):
     
 def regeneratCode(numeroElecteur):
     try:
-        codeSecurite = generate_random_code()
+        codeSecurite = generate_random_code(8)
         conn = connectionDb()
         cursor =  conn.cursor()
 
@@ -72,24 +67,26 @@ def getAllCandidat():
         candidats = []
         for row in result:
             candidat = {
-                "numero_electeur": row[0],
-                "nom": row[1],
-                "prenom": row[2],
-                "date_naissance": row[3],
-                "email": row[4],
-                "telephone": row[5],
-                "parti_politique": row[6],
-                "slogan": row[7],
-                "photo_url": row[8],  # This should match the photo field in your DB schema
-                "couleur_parti_1": row[9],
-                "page_info_url": row[10],
-                "code_securite": row[11],
-                "couleur_parti_2": row[12],
-                "couleur_parti_3": row[13]
+                "id": row[0],
+                "numero_electeur": row[1],
+                "nom": row[2],
+                "prenom": row[3],
+                "date_naissance": row[4],
+                "email": row[5],
+                "telephone": row[6],
+                "parti_politique": row[7],
+                "slogan": row[8],
+                "photo_url": row[9],
+                "couleur_parti_1": row[10],
+                "page_info_url": row[11],
+                # "code_securite": row[12],
+                # "date_enregistrement": row[13],
+                "couleur_parti_2": row[14],
+                "couleur_parti_3": row[15]
             }
 
             # Read the photo file and encode it in base64
-            photo_path = os.path.join("uploads", row[8])  # Corrected index
+            photo_path = os.path.join("uploads", row[9])  # Updated index for photo_url
             if os.path.exists(photo_path):
                 with open(photo_path, "rb") as photo_file:
                     candidat["photo"] = base64.b64encode(photo_file.read()).decode('utf-8')
@@ -166,7 +163,7 @@ async def saveCandidature(
         nom = result[0][0]
         prenom = result[0][1]
         dateNaissance = result[0][2]
-        codeSecurite = generate_random_code()
+        codeSecurite = generate_random_code(8)
 
         print(f"code de securite {codeSecurite}")
 
@@ -188,3 +185,16 @@ async def saveCandidature(
         return False
     
     return True
+
+def suiviParrainage(candidatId: int):
+    try:
+        conn= connectionDb()
+        if conn:
+            cursor = conn.cursor()
+
+        cursor.execute("SELECT numero_electeur, date_parrainage FROM parrainage WHERE candidat_id = %s", (candidatId,))
+        result = cursor.fetchall()
+        print(result)
+        return result
+    except Exception as error:
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"error": "Une erreur interne s'est produit"})

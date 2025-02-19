@@ -100,6 +100,8 @@ def get_all_candidat():
         print(f"Error: {error}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"Erreur": "Veuillez verifier la requete"})
     
+
+
 @router.post("/regenerer_code")
 def regener_code(numero_electeur):
     try:
@@ -113,3 +115,11 @@ def regener_code(numero_electeur):
         return result
     except Exception as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"erreur": error})
+
+@router.post('/statistique_parrainage')
+def get_statistique(candidat_id):
+    try:
+        result = candidat.suiviParrainage(candidat_id)
+        return result
+    except Exception as error:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"erreur":"erreur interne "})

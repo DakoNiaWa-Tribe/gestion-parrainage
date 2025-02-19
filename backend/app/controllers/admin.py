@@ -1,7 +1,78 @@
-from fastapi import HTTPException
 import mysql.connector
 from app.database import connectionDb
 import mysql
+import csv
+from fastapi import File, UploadFile, HTTPException, APIRouter, Form, Request, status
+import mysql.connector
+from app.database import connectionDb
+import mysql
+from app.controllers import admin
+
+
+
+
+
+async def uploadElecteurCsv(
+    request: Request,
+    file: UploadFile=File(...), 
+    checksum: str = Form(...),
+    userId: int = Form(...)
+):
+        conn = connectionDb()
+        if conn:
+            cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT etat_upload_electeurs from etat_import
+        """)
+        etatUpload = cursor.fetchone()
+
+
+        if etatUpload is None:
+            raise HTTPException(status_code=400, detail="Aucune donnée trouvée pour etat_upload_electeurs")
+
+        etatUpload = etatUpload[0]
+
+        if(etatUpload == 0): 
+           return HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Les uploads sont actuellement bloqués. Veuillez contacter l'administrateur."
+                )
+        
+            
+
+        if file.content_type != "text/csv":
+            raise HTTPException(status_code=400, detail={"error": "invalid file type"})
+        
+        ipAdress = request.client.host
+        contents = await file.read()
+
+        isValid = admin.controler_fichier_db(userId, ipAdress, checksum, contents)
+        if not isValid:
+            raise HTTPException(status_code=400, detail="echec: fichier altere ou encodage incorrect")
+
+        csvReader = csv.DictReader(contents.decode('UTF-8').splitlines())
+        
+        cursor = conn.cursor()
+
+        for row in csvReader:
+            numeroElecteur = row['numero_electeur']
+            cni = row['cni']
+            nom = row['nom']
+            prenom = row['prenom']
+            dateNaiss = row['date_naissance']
+            lieuNaiss = row['lieu_naissance']
+            sexe = row['sexe']
+            bureauVote = row['bureau_vote']
+
+            cursor.execute(""" 
+                INSERT INTO temp_electeurs(numero_electeur, cni, nom, prenom, date_naissance, lieu_naissance, sexe, bureau_vote)
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s) 
+            """, (numeroElecteur, cni, nom, prenom, dateNaiss, lieuNaiss, sexe, bureauVote))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
 
 def controler_fichier_db(userId, ipAdresse, fileCheckSum, fileContent):
     try:
@@ -83,3 +154,18 @@ def validerImportation():
 
     except mysql.connector.Error as error:
         print(error)
+
+
+def controlerEtatImport():
+    conn = connectionDb()
+    print(conn)
+    if conn:
+        cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT etat_upload_electeurs from etat_import
+    """)
+    etatUpload = cursor.fetchone()[0]
+    print(etatUpload)
+    return etatUpload
+

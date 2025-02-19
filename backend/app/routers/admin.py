@@ -2,7 +2,6 @@ from fastapi import File, UploadFile, HTTPException, APIRouter, Form, Request, s
 import mysql.connector
 from app.database import connectionDb
 import mysql
-import csv
 from app.controllers import admin
 
 
@@ -18,63 +17,11 @@ async def electeur_upload_csv(
     userId: int = Form(...)
     ):
     try:
-        conn = connectionDb()
-        if conn:
-            cursor = conn.cursor()
-
-        cursor.execute("""
-            SELECT etat_upload_electeurs from etat_import
-        """)
-        etatUpload = cursor.fetchone()
-
-
-        if etatUpload is None:
-            raise HTTPException(status_code=400, detail="Aucune donnée trouvée pour etat_upload_electeurs")
-
-        etatUpload = etatUpload[0]
-
-        if(etatUpload == 0): 
-           return HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Les uploads sont actuellement bloqués. Veuillez contacter l'administrateur."
-                )
-        if (file is None or checksum is None or userId is None) :
-            raise HTTPException(status_code=400, detail={"error": "fournissez les champs necessaire"})
-            
-
-        if file.content_type != "text/csv":
-            raise HTTPException(status_code=400, detail={"error": "invalid file type"})
-        
-        ipAdress = request.client.host
-        contents = await file.read()
-
-        isValid = admin.controler_fichier_db(userId, ipAdress, checksum, contents)
-        if not isValid:
-            raise HTTPException(status_code=400, detail="echec: fichier altere ou encodage incorrect")
-
-        csvReader = csv.DictReader(contents.decode('UTF-8').splitlines())
-        
-        cursor = conn.cursor()
-
-        for row in csvReader:
-            numeroElecteur = row['numero_electeur']
-            cni = row['cni']
-            nom = row['nom']
-            prenom = row['prenom']
-            dateNaiss = row['date_naissance']
-            lieuNaiss = row['lieu_naissance']
-            sexe = row['sexe']
-            bureauVote = row['bureau_vote']
-
-            cursor.execute(""" 
-                INSERT INTO temp_electeurs(numero_electeur, cni, nom, prenom, date_naissance, lieu_naissance, sexe, bureau_vote)
-                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s) 
-            """, (numeroElecteur, cni, nom, prenom, dateNaiss, lieuNaiss, sexe, bureauVote))
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return {"message": "Fichier accepte et en attente de validation"}
+        result = await admin.uploadElecteurCsv(request, file, checksum, userId)
+        return {
+            "Message": result,
+            "status_code": status.HTTP_200_OK
+        }
     except Exception as error:
         print(error)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"message": "Veuillez verifier le fichier"})
@@ -83,27 +30,18 @@ async def electeur_upload_csv(
 @router.post("/controler_electeurs")
 async def controler_electeur(request: Request):
     try:
-        conn = connectionDb()
-        print(conn)
-        if conn:
-            cursor = conn.cursor()
-
-        cursor.execute("""
-            SELECT etat_upload_electeurs from etat_import
-        """)
-        etatUpload = cursor.fetchone()[0]
-        print(etatUpload)
-
-        if(etatUpload == 0): 
-           return HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Les uploads sont actuellement bloqués. Veuillez contacter l'administrateur."
-                )
+        etatImpotResult = admin.controlerEtatImport()
+        print(etatImpotResult)
+        if etatImpotResult == 0:
+            return HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Les uploads sont actuellement bloqués. Veuillez contacter l'administrateur."
+            )
 
         isValid = await admin.controlerElecteur()
         print(isValid)
         if isValid == 0:
-            raise HTTPException(status_code=403, detail={"erreur":"tous les electeurs ne sont pas valides"})
+            return HTTPException(status_code=403, detail={"erreur":"tous les electeurs ne sont pas valides"})
         
         return {"message": "Le fichier electoral est valide et pret à etre importer definitivement",
                 "status_code": status.HTTP_200_OK
@@ -123,15 +61,7 @@ async def controler_electeur(request: Request):
 @router.post("/valider_importation")
 async def valider_importation():
     try:
-        conn = connectionDb()
-        print(conn)
-        if conn:
-            cursor = conn.cursor()
-
-        cursor.execute("""
-            SELECT etat_upload_electeurs from etat_import
-        """)
-        etatUpload = cursor.fetchone()[0]
+        etatUpload = admin.controlerEtatImport()
         print(etatUpload)
 
         if(etatUpload == 0): 
@@ -141,9 +71,6 @@ async def valider_importation():
                 )
         
         admin.validerImportation()
-        conn.commit()
-        cursor.close
-        conn.close()
         return {"message": "Transfere reuissi",
                 "status_code": status.HTTP_200_OK
                 }
