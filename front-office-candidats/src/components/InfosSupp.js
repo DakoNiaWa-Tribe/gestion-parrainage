@@ -18,7 +18,7 @@ function InfosSupp(){
             </ul>
         
                 <div className="linkButton">
-                <Link to='/RajoutInfos.js'>Saisie des informations complémentaires</Link>   {/*commit */}
+                <Link to='/RajoutInfos.js'>Saisie des informations complémentaires</Link>  
                 </div>
                 </div>
    </div>
