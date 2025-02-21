@@ -11,6 +11,13 @@ async def parrain_registration(data: ElecteurCheckResponse):
 
     try:
         cursor.execute("""
+        SELECT etat FROM  periode_parrainage
+        """)
+        etat = cursor.fetchone()
+        if etat and etat[0] == 'ferme':
+            return JSONResponse(status_code=400, content={"message": "La période de parrainage est fermée."})
+
+        cursor.execute("""
             SELECT * FROM electeurs WHERE cni = %s AND numero_electeur = %s AND nom = %s AND bureau_vote = %s
         """, (data.numero_id_national, data.numero_electeur, data.nom_famille, data.numero_bureau))
         isValid = cursor.fetchone()
@@ -19,7 +26,7 @@ async def parrain_registration(data: ElecteurCheckResponse):
             raise HTTPException(status_code=400, detail="Vous ne figurez pas sur la liste des électeurs.")
 
         cursor.execute("""
-            INSERT INTO parrain_electeurs (cni, numero_electeur, nom, bureau_vote, numero_tel, email) 
+            INSERT INTO parrain_electeurs (cni, numero_electeur, nom, bureau_vote) 
             VALUES (%s, %s, %s, %s)
         """, (data.numero_id_national, data.numero_electeur, data.nom_famille, data.numero_bureau))
         conn.commit()
@@ -39,6 +46,13 @@ async def confirmationParrainRegistration(data: ElecteurRegistration, background
     cursor = conn.cursor()
 
     try:
+        cursor.execute("""
+        SELECT etat FROM  periode_parrainage
+        """)
+        etat = cursor.fetchone()
+        if etat and etat[0] == 'ferme':
+            return JSONResponse(status_code=400, content={"message": "La période de parrainage est fermée."})
+
         cursor.execute("SELECT * FROM parrain_electeurs WHERE cni = %s", (data.numero_id_national,))
         if cursor.fetchone() is None:
             raise HTTPException(status_code=400, detail="Vous ne figurez pas sur la liste electoral")
@@ -80,6 +94,13 @@ def parrainerCandidatCheck(data: ParrainerCandidatCheckRequest):
         if conn:
             cursor = conn.cursor()
 
+        cursor.execute("""
+        SELECT etat FROM  periode_parrainage
+        """)
+        etat = cursor.fetchone()
+        if etat and etat[0] == 'ferme':
+            return JSONResponse(status_code=400, content={"message": "La période de parrainage est fermée."})
+            
         cursor.execute("""
             SELECT * FROM parrain_electeurs WHERE cni = %s AND numero_electeur = %s
         """, (data.numero_id_national, data.numero_electeur,))
@@ -126,7 +147,13 @@ def electeurAuth(data: ParrainerCandidatAuth):
         conn = connectionDb()
         if conn:
             cursor = conn.cursor()
-        
+        cursor.execute("""
+        SELECT etat FROM  periode_parrainage
+        """)
+        etat = cursor.fetchone()
+        if etat and etat[0] == 'ferme':
+            return JSONResponse(status_code=400, content={"message": "La période de parrainage est fermée."})
+
         cursor.execute("""
             SELECT code_securite FROM parrain_electeurs WHERE numero_electeur = %s AND cni = %s
         """, (data.numero_electeur, data.numero_id_national,))
