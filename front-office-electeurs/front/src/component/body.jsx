@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
+import anime from "animejs";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 const Butlog = () => {
@@ -50,11 +51,30 @@ function Layout({ children }) {
   const name = "Samba";
   const profilImg = "img/tete-chat-profil_372268-573.jpg";
   const [isconnected, setIsconnected] = useState(false);
+  const headerRef = useRef(null);
+  const footerRef = useRef(null);
+
+  useEffect(() => {
+        anime({
+          targets: headerRef.current, // Cible la div référencée
+          translateY: [-100,0],
+          duration: 1300,
+          easing: 'easeOutSine', // Animation fluide
+        });
+        anime({
+          targets: footerRef.current, // Cible la div référencée
+          opacity: [0,1],
+          duration: 1500,
+          easing: 'easeInOutQuad', // Animation fluide
+        });
+      }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="bg-blue-600 text-white shadow-lg w-full flex justify-between items-center p-4 md:px-6 md:h-[8vh]">
+      <header 
+        ref={headerRef}
+        className="bg-blue-600 text-white shadow-lg w-full flex justify-between items-center p-4 md:px-6 md:h-[8vh]">
         <div className="flex justify-between items-center w-full max-w-screen-xxl  mx-auto">
           <div className="flex gap-4 items-center">
             <div className="flex justify-center items-center">
@@ -83,10 +103,12 @@ function Layout({ children }) {
       </header>
 
       {/* Contenu Principal */}
-      <main className="flex-1 flex container mx-auto px-4">{children}</main>
+      <main className="flex-1 flex w-full">{children}</main>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-gray-300 text-center py-4 mt-4">
+      <footer 
+        ref={footerRef}
+        className="bg-gray-800 text-gray-300 text-center py-4 ">
         <p>&copy; {new Date().getFullYear()} Parrainage Électoral - Tous droits réservés.</p>
       </footer>
     </div>
@@ -99,3 +121,4 @@ Layout.propTypes = {
 };
 
 export default Layout;
+
