@@ -74,7 +74,7 @@ function Layout({ children }) {
       {/* Header */}
       <header 
         ref={headerRef}
-        className="bg-blue-600 text-white shadow-lg w-full flex justify-between items-center p-4 md:px-6 md:h-[8vh]">
+        className="bg-[#144266] text-white shadow-lg w-full flex justify-between items-center p-4 md:px-6 md:h-[8vh]">
         <div className="flex justify-between items-center w-full max-w-screen-xxl  mx-auto">
           <div className="flex gap-4 items-center">
             <div className="flex justify-center items-center">
