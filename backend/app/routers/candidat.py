@@ -1,6 +1,7 @@
-from fastapi import HTTPException, APIRouter, status, UploadFile, File, Form
+from fastapi import HTTPException, APIRouter, status, UploadFile, File, Form, Depends
 from typing import Optional
 from app.controllers import candidat
+from app.utils import oauth
 
 router = APIRouter(prefix="/candidat", tags=['Candidat'])
 

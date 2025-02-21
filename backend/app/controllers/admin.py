@@ -7,10 +7,8 @@ import mysql.connector
 from app.database import connectionDb
 import mysql
 from app.controllers import admin
-
-
-
-
+from app.models import auth
+from app.utils import oauth
 
 async def uploadElecteurCsv(
     request: Request,
@@ -169,3 +167,30 @@ def controlerEtatImport():
     print(etatUpload)
     return etatUpload
 
+def adminLogin(data):
+    conn = connectionDb()
+    if conn:
+        cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT * from admin_users WHERE username = %s AND password = %s           
+    """, (data.username, data.password,))
+
+    result = cursor.fetchone()
+    print(result[0])
+
+    accessToken = oauth.createAcessToken(data={"user_id": result[0], "name": result[3]})
+
+    if result is None:
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail={"erreur": "nom utilisateur ou mot de passe incorrect"})
+    
+    return {
+        "message": "Connexion avec succes",
+        "admin_info":[{
+            "id": result[0],
+            "name": result[3]
+    }],
+        "access_token": accessToken,
+        "status_code": status.HTTP_200_OK
+    }

@@ -1,8 +1,9 @@
-from fastapi import File, UploadFile, HTTPException, APIRouter, Form, Request, status
+from fastapi import File, UploadFile, HTTPException, APIRouter, Form, Request, status, Depends
 import mysql.connector
 from app.database import connectionDb
 import mysql
 from app.controllers import admin
+from app.utils import oauth
 
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
@@ -14,7 +15,8 @@ async def electeur_upload_csv(
     request: Request,
     file: UploadFile=File(...), 
     checksum: str = Form(...),
-    userId: int = Form(...)
+    userId: int = Form(...),
+    user_id: int = Depends(oauth.getCurrentUser)
     ):
     try:
         result = await admin.uploadElecteurCsv(request, file, checksum, userId)
@@ -28,7 +30,8 @@ async def electeur_upload_csv(
 
 
 @router.post("/controler_electeurs")
-async def controler_electeur(request: Request):
+async def controler_electeur(request: Request,
+                             user_id: int = Depends(oauth.getCurrentUser)):
     try:
         etatImpotResult = admin.controlerEtatImport()
         print(etatImpotResult)
@@ -59,7 +62,9 @@ async def controler_electeur(request: Request):
 
 
 @router.post("/valider_importation")
-async def valider_importation():
+async def valider_importation(
+    user_id: int = Depends(oauth.getCurrentUser)
+):
     try:
         etatUpload = admin.controlerEtatImport()
         print(etatUpload)
