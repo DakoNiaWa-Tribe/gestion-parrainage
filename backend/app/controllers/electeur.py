@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from app.database import connectionDb
 from app.models.electeur import ElecteurCheckResponse, ElecteurRegistration, ParrainerCandidatCheckRequest, ParrainerCandidatAuth
 from app.utils.codeGeneration import generate_random_code
+from app.utils.verification_periode_parrainage import verif_parrainage
 # from app.utils import send_sms #, send_email
 
 async def parrain_registration(data: ElecteurCheckResponse):
@@ -10,12 +11,9 @@ async def parrain_registration(data: ElecteurCheckResponse):
     cursor = conn.cursor()
 
     try:
-        cursor.execute("""
-        SELECT etat FROM  periode_parrainage
-        """)
-        etat = cursor.fetchone()
-        if etat and etat[0] == 'ferme':
-            return JSONResponse(status_code=400, content={"message": "La période de parrainage est fermée."})
+        etat = verif_parrainage()
+        if etat["status_code"] == status.HTTP_400_BAD_REQUEST:
+            return etat
 
         cursor.execute("""
             SELECT * FROM electeurs WHERE cni = %s AND numero_electeur = %s AND nom = %s AND bureau_vote = %s
@@ -46,12 +44,12 @@ async def confirmationParrainRegistration(data: ElecteurRegistration, background
     cursor = conn.cursor()
 
     try:
-        cursor.execute("""
-        SELECT etat FROM  periode_parrainage
-        """)
-        etat = cursor.fetchone()
-        if etat and etat[0] == 'ferme':
-            return JSONResponse(status_code=400, content={"message": "La période de parrainage est fermée."})
+        etat = verif_parrainage()
+        if etat["status_code"] == status.HTTP_400_BAD_REQUEST:
+                return JSONResponse(
+                    status_code=etat["status_code"],
+                    content={"message": etat["message"]}
+                    )
 
         cursor.execute("SELECT * FROM parrain_electeurs WHERE cni = %s", (data.numero_id_national,))
         if cursor.fetchone() is None:
@@ -94,13 +92,13 @@ def parrainerCandidatCheck(data: ParrainerCandidatCheckRequest):
         if conn:
             cursor = conn.cursor()
 
-        cursor.execute("""
-        SELECT etat FROM  periode_parrainage
-        """)
-        etat = cursor.fetchone()
-        if etat and etat[0] == 'ferme':
-            return JSONResponse(status_code=400, content={"message": "La période de parrainage est fermée."})
-            
+        etat = verif_parrainage()
+        if etat["status_code"] == status.HTTP_400_BAD_REQUEST:
+                return JSONResponse(
+                    status_code=etat["status_code"],
+                    content={"message": etat["message"]}
+                    )
+
         cursor.execute("""
             SELECT * FROM parrain_electeurs WHERE cni = %s AND numero_electeur = %s
         """, (data.numero_id_national, data.numero_electeur,))
@@ -147,12 +145,12 @@ def electeurAuth(data: ParrainerCandidatAuth):
         conn = connectionDb()
         if conn:
             cursor = conn.cursor()
-        cursor.execute("""
-        SELECT etat FROM  periode_parrainage
-        """)
-        etat = cursor.fetchone()
-        if etat and etat[0] == 'ferme':
-            return JSONResponse(status_code=400, content={"message": "La période de parrainage est fermée."})
+        etat = verif_parrainage()
+        if etat["status_code"] == status.HTTP_400_BAD_REQUEST:
+                return JSONResponse(
+                    status_code=etat["status_code"],
+                    content={"message": etat["message"]}
+                    )
 
         cursor.execute("""
             SELECT code_securite FROM parrain_electeurs WHERE numero_electeur = %s AND cni = %s
