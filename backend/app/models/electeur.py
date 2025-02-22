@@ -29,3 +29,8 @@ class ParrainerCandidatAuth(BaseModel):
     prenom: str
     numero_bureau: str
     code_securite: str
+
+class ValiderParrainageRequest(BaseModel):
+    numero_electeur: str
+    id_candidat: str
+    code_otp: str

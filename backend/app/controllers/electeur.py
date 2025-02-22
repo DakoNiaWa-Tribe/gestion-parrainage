@@ -1,8 +1,8 @@
 from fastapi import HTTPException, status, BackgroundTasks
 from fastapi.responses import JSONResponse
 from app.database import connectionDb
-from app.models.electeur import ElecteurCheckResponse, ElecteurRegistration, ParrainerCandidatCheckRequest, ParrainerCandidatAuth
-from app.utils.codeGeneration import generate_random_code
+from app.models.electeur import ElecteurCheckResponse, ElecteurRegistration, ParrainerCandidatCheckRequest, ParrainerCandidatAuth, ValiderParrainageRequest
+from app.utils.codeGeneration import generate_random_code, generate_random_digit_code
 # from app.utils import send_sms #, send_email
 
 async def parrain_registration(data: ElecteurCheckResponse):
@@ -10,6 +10,7 @@ async def parrain_registration(data: ElecteurCheckResponse):
     cursor = conn.cursor()
 
     try:
+
         cursor.execute("""
             SELECT * FROM electeurs WHERE cni = %s AND numero_electeur = %s AND nom = %s AND bureau_vote = %s
         """, (data.numero_id_national, data.numero_electeur, data.nom_famille, data.numero_bureau))
@@ -19,7 +20,7 @@ async def parrain_registration(data: ElecteurCheckResponse):
             raise HTTPException(status_code=400, detail="Vous ne figurez pas sur la liste des électeurs.")
 
         cursor.execute("""
-            INSERT INTO parrain_electeurs (cni, numero_electeur, nom, bureau_vote, numero_tel, email) 
+            INSERT INTO parrain_electeurs (cni, numero_electeur, nom, bureau_vote) 
             VALUES (%s, %s, %s, %s)
         """, (data.numero_id_national, data.numero_electeur, data.nom_famille, data.numero_bureau))
         conn.commit()
@@ -28,6 +29,7 @@ async def parrain_registration(data: ElecteurCheckResponse):
         print("Erreur:", e)
         raise HTTPException(status_code=500, detail="Erreur interne du serveur")
     finally:
+        conn.commit()
         cursor.close()
         conn.close()
 
@@ -86,17 +88,13 @@ def parrainerCandidatCheck(data: ParrainerCandidatCheckRequest):
         isValid = cursor.fetchone()
         
         if isValid is None:
-            return{
-                "message": "Vous etes pas un parrain electeur",
-                "status_code": status.HTTP_404_NOT_FOUND
-            }
+            return False
         
         cursor.execute("""
             SELECT nom,prenom,date_naissance,bureau_vote  FROM electeurs
                        WHERE cni = %s AND numero_electeur = %s
         """,(data.numero_id_national, data.numero_electeur))
         result = cursor.fetchone()
-        # print(result)
         
         return {
                 "data": {
@@ -112,6 +110,9 @@ def parrainerCandidatCheck(data: ParrainerCandidatCheckRequest):
         print(error)
         return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                              detail={"Erreur": f"une erreur interne s'est produite"})
+    finally:
+        cursor.close()
+        conn.close()
     
 def electeurAuth(data: ParrainerCandidatAuth):
     try:
@@ -126,7 +127,7 @@ def electeurAuth(data: ParrainerCandidatAuth):
         conn = connectionDb()
         if conn:
             cursor = conn.cursor()
-        
+
         cursor.execute("""
             SELECT code_securite FROM parrain_electeurs WHERE numero_electeur = %s AND cni = %s
         """, (data.numero_electeur, data.numero_id_national,))
@@ -180,3 +181,164 @@ def electeurAuth(data: ParrainerCandidatAuth):
             "erreur": f"{error}",
             "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR
         }
+    
+def electeurVoted(numero_electeur: str):
+    try:
+        conn = connectionDb()
+        if conn :
+            cursor = conn.cursor()
+        
+            cursor.execute("""
+                SELECT voted from parrain_electeurs 
+                        WHERE numero_electeur = %s                             
+                    """,(numero_electeur,))
+            
+            result = cursor.fetchone()
+            print(result[0])
+            if result[0] == 0 :
+                return False
+        
+            return True
+    except Exception as error:
+        return{
+            "erreur": f"{error}",
+            "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR
+        }
+        
+
+def envoyerCodeOtp(data: ParrainerCandidatCheckRequest):
+    try:
+        isParrain = parrainerCandidatCheck(data)
+
+        if isParrain is None or isParrain is False:
+            return {
+                "message":"Vous n'etes pas parrain",
+                "status_code": status.HTTP_404_NOT_FOUND
+            }
+        
+        hasVoted = electeurVoted(data.numero_electeur)
+        if hasVoted:
+            return {
+                "message": "Vous avez deja vote",
+                "status_code": status.HTTP_403_FORBIDDEN
+            }
+        
+        conn = connectionDb()
+        if conn:
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                        SELECT nom, numero_tel, email from parrain_electeurs
+                                WHERE numero_electeur = %s AND cni = %s 
+            """,(data.numero_electeur, data.numero_id_national,))
+            resultDb = cursor.fetchone()
+            
+            otpCode = generate_random_digit_code(5)
+
+            cursor.execute("""
+                UPDATE parrain_electeurs SET code_otp = %s
+                        WHERE numero_electeur = %s AND cni = %s 
+            """, (otpCode,data.numero_electeur, data.numero_id_national,))
+
+            print(otpCode)
+
+            nom = resultDb[0].decode('utf-8')
+            numeroTel = resultDb[1].decode('utf-8')
+            email = resultDb[2].decode('utf-8')
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            return {
+                "message":"Code otp envoyer! Veuillez verifier vos messages",
+                "nom": nom,
+                "numero_tel": numeroTel,
+                "email": email,
+                "status_code": status.HTTP_200_OK
+            }
+    except Exception as error:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                            ,detail={"erreur", f"{error}"})
+
+def otpCheck(numero_electeur: str, otp: str):
+    try:
+        conn = connectionDb()
+        print(otp)
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT code_otp from parrain_electeurs WHERE numero_electeur = %s
+            """, (numero_electeur,))
+            dbOtp = cursor.fetchone()
+            print(dbOtp[0])
+            if dbOtp[0] == None:
+                return False
+            
+            if dbOtp[0].decode("utf-8") != otp:
+                print("FALSE")
+                return False
+            
+            return True
+    except Exception as error:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                            ,detail={"erreur", f"{error}"})
+
+def validerParrainage(data: ValiderParrainageRequest):
+    try:
+        hasVoted = electeurVoted(data.numero_electeur)
+        if hasVoted:
+            return {
+                "message": "Vous avez deja vote",
+                "status_code": status.HTTP_403_FORBIDDEN
+            }
+        
+        if not otpCheck(data.numero_electeur, data.code_otp):
+            return {
+                "message": "code otp incorrect",
+                "status_code": status.HTTP_404_NOT_FOUND
+            }
+        
+        conn = connectionDb()
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO parrainages(numero_electeur, candidat_id, code_validation)
+                           VALUES(%s, %s, %s) 
+            """, (data.numero_electeur, data.id_candidat, data.code_otp,))
+            print("parrainer avec success")
+
+            cursor.execute("""
+                  UPDATE parrain_electeurs SET voted = 1 WHERE numero_electeur = %s         
+            """, (data.numero_electeur,))
+            print("look successful")
+
+            cursor.execute("""
+                  UPDATE parrain_electeurs SET code_otp = NULL WHERE numero_electeur = %s         
+            """, (data.numero_electeur,))
+            print("code reset successful")
+
+            cursor.execute("""
+                  SELECT nom, prenom, parti_politique FROM candidats
+                           WHERE id = %s      
+            """, (data.id_candidat,))
+            candidatData = cursor.fetchone()
+            print(f"candidat data: {candidatData}")
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            return {
+                "message": "Parrainage effectue avec succes",
+                "candidat_data":{
+                    "nom": candidatData[0],
+                    "prenom": candidatData[1],
+                    "parti_politique": candidatData[2],
+                }
+            }
+    except Exception as error:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                            ,detail={"erreur", f"{error}"})
+
+
