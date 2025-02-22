@@ -1,8 +1,8 @@
 from fastapi import HTTPException, status, BackgroundTasks
 from fastapi.responses import JSONResponse
 from app.database import connectionDb
-from app.models.electeur import ElecteurCheckResponse, ElecteurRegistration, ParrainerCandidatCheckRequest, ParrainerCandidatAuth
-from app.utils.codeGeneration import generate_random_code
+from app.models.electeur import ElecteurCheckResponse, ElecteurRegistration, ParrainerCandidatCheckRequest, ParrainerCandidatAuth, ValiderParrainageRequest
+from app.utils.codeGeneration import generate_random_code, generate_random_digit_code
 from app.utils.verification_periode_parrainage import verif_parrainage
 # from app.utils import send_sms #, send_email
 
