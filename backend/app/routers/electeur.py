@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, BackgroundTasks
 from app.database import connectionDb
 from app.models.electeur import ElecteurCheckResponse, ElecteurRegistration, ParrainerCandidatCheckRequest, ParrainerCandidatAuth, ValiderParrainageRequest
-from app.controllers.electeur import parrainerCandidatCheck, confirmationParrainRegistration, electeurAuth, parrain_registration, envoyerCodeOtp, validerParrainage
+from app.controllers.electeur import parrainerCandidatCheck, confirmationParrainRegistration, electeurAuth, parrain_registration, validerParrainage, envoyerCodeOtp
 # from app.utils.notifications import send_sms #, send_email
 
 router = APIRouter(prefix="/electeur", tags=["Électeurs"])

@@ -1,8 +1,9 @@
 from fastapi import HTTPException, status, BackgroundTasks
 from fastapi.responses import JSONResponse
 from app.database import connectionDb
-from app.models.electeur import ElecteurCheckResponse, ElecteurRegistration, ParrainerCandidatCheckRequest, ParrainerCandidatAuth, ValiderParrainageRequest
-from app.utils.codeGeneration import generate_random_code, generate_random_digit_code
+from app.models.electeur import ElecteurCheckResponse, ElecteurRegistration, ParrainerCandidatCheckRequest, ParrainerCandidatAuth
+from app.utils.codeGeneration import generate_random_code
+from app.utils.verification_periode_parrainage import verif_parrainage
 # from app.utils import send_sms #, send_email
 
 async def parrain_registration(data: ElecteurCheckResponse):
@@ -10,6 +11,9 @@ async def parrain_registration(data: ElecteurCheckResponse):
     cursor = conn.cursor()
 
     try:
+        etat = verif_parrainage()
+        if etat["status_code"] == status.HTTP_400_BAD_REQUEST:
+            return etat
 
         cursor.execute("""
             SELECT * FROM electeurs WHERE cni = %s AND numero_electeur = %s AND nom = %s AND bureau_vote = %s
@@ -41,6 +45,13 @@ async def confirmationParrainRegistration(data: ElecteurRegistration, background
     cursor = conn.cursor()
 
     try:
+        etat = verif_parrainage()
+        if etat["status_code"] == status.HTTP_400_BAD_REQUEST:
+                return JSONResponse(
+                    status_code=etat["status_code"],
+                    content={"message": etat["message"]}
+                    )
+
         cursor.execute("SELECT * FROM parrain_electeurs WHERE cni = %s", (data.numero_id_national,))
         if cursor.fetchone() is None:
             raise HTTPException(status_code=400, detail="Vous ne figurez pas sur la liste electoral")
@@ -81,6 +92,13 @@ def parrainerCandidatCheck(data: ParrainerCandidatCheckRequest):
         conn = connectionDb()
         if conn:
             cursor = conn.cursor()
+
+        etat = verif_parrainage()
+        if etat["status_code"] == status.HTTP_400_BAD_REQUEST:
+                return JSONResponse(
+                    status_code=etat["status_code"],
+                    content={"message": etat["message"]}
+                    )
 
         cursor.execute("""
             SELECT * FROM parrain_electeurs WHERE cni = %s AND numero_electeur = %s
@@ -127,6 +145,12 @@ def electeurAuth(data: ParrainerCandidatAuth):
         conn = connectionDb()
         if conn:
             cursor = conn.cursor()
+        etat = verif_parrainage()
+        if etat["status_code"] == status.HTTP_400_BAD_REQUEST:
+                return JSONResponse(
+                    status_code=etat["status_code"],
+                    content={"message": etat["message"]}
+                    )
 
         cursor.execute("""
             SELECT code_securite FROM parrain_electeurs WHERE numero_electeur = %s AND cni = %s
