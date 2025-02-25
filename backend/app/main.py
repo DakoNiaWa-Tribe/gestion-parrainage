@@ -1,32 +1,16 @@
-from fastapi import FastAPI
-import mysql.connector
-import os
-from dotenv import load_dotenv, dotenv_values
+from fastapi import FastAPI, status, HTTPException
+from .routers import electeur, admin, candidat, auth
+from app.database import connectionDb
 
-load_dotenv()
-# database connection section
-mydb = mysql.connector.connect(
-    host=os.getenv("SQL_HOST"),
-    user=os.getenv("SQL_USERNAME"),
-    password=os.getenv("SQL_PASSWORD"),
-    database=os.getenv("SQL_DATABASE_NAME"),
-    port=3306
-)
-
-cursor = mydb.cursor()
-
-if mydb :
-    print("Connection to db successfull")
-
-
+# Création de l'application FastAPI
 app = FastAPI()
 
+app.include_router(admin.router)
+app.include_router(candidat.router)
+app.include_router(electeur.router)
+app.include_router(auth.router)
 
 
 @app.get('/')
 def read_root():
-    return {"Message":"Hello to the api db connected"}
-
-# @app.post('/admin/upload')
-# def upload_csv(data: electeurCreated):
-#     # if f not 
+    return {"message": "Bienvenue sur l'API de parrainage ! La base de données est connectée."}
