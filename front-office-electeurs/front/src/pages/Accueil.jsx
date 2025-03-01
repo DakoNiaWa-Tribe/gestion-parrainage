@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import Layout from "../component/body"
-import Candidat from "../component/candidat"
 import Swiper3DCarousel from "../component/Slider";
 import anime from "animejs";
 
@@ -8,22 +7,7 @@ import anime from "animejs";
 
 function Accueil() {
 
-  /*const router= createBrowserRouter([
 
-    {
-      path: '/form',
-      element: Formsite
-    }
-  ])*/
-    const name = "Samba";
-    const profilImg = "img/tete-chat-profil_372268-573.jpg"; 
-     const [userDetails] = useState({
-        firstName: "Jean",
-        lastName: "Dupont",
-        birthDate: "12/04/1990",
-        votingOffice: "Bureau 12",
-      });
-      const [isActive, setIsActive] = useState(true);
       const [mode, setmode] = useState("carrousel");
       const buttonRef = useRef(null);
       const buttonRef1 = useRef(null);
@@ -118,7 +102,7 @@ function Accueil() {
 
               </div>
               <Swiper3DCarousel mode={mode} />
-
+              {/* <CandidatCard/> */}
             </div>
       </Layout>
     </>

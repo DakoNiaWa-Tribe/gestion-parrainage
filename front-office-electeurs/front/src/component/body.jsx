@@ -50,6 +50,7 @@ const Profil = ({ name, profilImg }) => {
 function Layout({ children }) {
   const name = "Samba";
   const profilImg = "img/tete-chat-profil_372268-573.jpg";
+  // eslint-disable-next-line no-unused-vars
   const [isconnected, setIsconnected] = useState(false);
   const headerRef = useRef(null);
   const footerRef = useRef(null);

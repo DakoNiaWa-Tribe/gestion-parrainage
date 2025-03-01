@@ -301,7 +301,7 @@ const Connectionpart2 = ({formRef , userDetails}) => {
       <form className="flex flex-col gap-4">
         <div>
           <label className="block text-gray-600 text-sm font-medium mb-1">
-            Code d'authentification
+            Code d&apos;authentification
           </label>
           <input
             type="text"
@@ -344,7 +344,7 @@ const CardForm = () => {
     votingOffice: "Bureau 12",
   });
 
- 
+
 
   
     useEffect(() => {
