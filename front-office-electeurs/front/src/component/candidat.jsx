@@ -95,8 +95,9 @@ const CandidatCard = ({ userDetails }) => {
       </div>
       </div>
 
-        <div className="absolute w-full  h-100 bg-white blur-[50px] -left-1/2 -top-1/2"></div>
-        <div className="absolute w-[30%]  h-50 bg-white blur-[50px]  left-[70%] top-[80%]"></div>
+        <div className="absolute w-full  h-100  bg-amber-300 blur-[50px] -left-1/2 -top-1/2"></div>
+        <div className="absolute w-[30%]  h-50 bg-blue-600 blur-[50px]  left-[70%] top-[80%]"></div>
+        <div className="absolute w-[100%]  h-50 bg-red-600 blur-[70px]  left-[0%] top-[30%]"></div>
     </div>
     </>
    
