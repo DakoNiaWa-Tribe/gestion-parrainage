@@ -40,6 +40,7 @@ const ConfirmationParrainage = ({ selectedcandidat, setParainer, Parainer, onCon
         throw new Error("Erreur lors de la validation du code.");
       }
 
+      // eslint-disable-next-line no-unused-vars
       const data = await response.json();
       alert("Parrainage confirmé avec succès !");
       onConfirm(codeConfirmation);
