@@ -9,7 +9,7 @@ export const useAuth = () => useContext(AuthContext);
 
 // Provider qui englobe l'application
 export const AuthProvider = ({ children }) => {
-  const [isconnected, setIsconnected] = useState(true);
+  const [isconnected, setIsconnected] = useState(false);
 
   return (
     <AuthContext.Provider value={{ isconnected, setIsconnected }}>

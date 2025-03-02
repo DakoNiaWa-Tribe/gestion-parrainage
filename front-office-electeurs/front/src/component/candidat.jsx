@@ -50,9 +50,9 @@ const CandidatCard = ({ userDetails,setSelectedcandidat,setParainer,Parainer,isc
          {/* Profil */}
       <div className="flex w-full h-[35%]  mt-2 flex-col items-center justify-center gap-4">
         <div className="min-w-[100px] min-h-[100px] w-[15vh] h-[15vh]  rounded-full overflow-hidden border-4 border-white shadow-lg">
-          <img src={userDetails.profilImg} alt="Profil" className="w-full h-full object-cover" />
+          <img src={userDetails.photo_url} alt="Profil" className="w-full h-full object-cover" />
         </div>
-        <h2 className="text-3xl font-bold text-center">{userDetails.firstName} {userDetails.lastName}</h2>
+        <h2 className="text-3xl font-bold text-center">{userDetails.prenom} {userDetails.nom}</h2>
       </div>
 
       <span className="bg-white w-3/4 h-0.5 my-4 opacity-50"></span>
@@ -67,8 +67,8 @@ const CandidatCard = ({ userDetails,setSelectedcandidat,setParainer,Parainer,isc
       {/* Infos Personnelles */}
       <div className="w-full text-center h-[13%] text-sm  md:text-base ">
         <h3 className="text-lg font-semibold mb-2">Informations Personnelles</h3>
-        <p>🎂 <span className="font-medium">Date :</span> {userDetails.birthDate}</p>
-        <p>🗳️ <span className="font-medium">Vote :</span> {userDetails.votingOffice}</p>
+        <p>🎂 <span className="font-medium">Date :</span> {userDetails.date_naissance}</p>
+        <p>🗳️<span className="font-medium  ">URL :</span>  <a href={userDetails.page_info_url} className=" capitalize underline decoration-blue-300  fw-bolder" > {userDetails.page_info_url}</a> </p>
       </div>
 
       <span className="bg-white w-3/4 h-0.5 my-2 opacity-50"></span>
@@ -76,7 +76,7 @@ const CandidatCard = ({ userDetails,setSelectedcandidat,setParainer,Parainer,isc
       {/* Infos Parti */}
       <div className="w-2/3 p-3 md:p-4 rounded-lg  text-center bg-white text-gray-900 border-2 border-gray-300 shadow-md">
         <h3 className="text-lg font-semibold">Parti Politique</h3>
-        <p className="text-sm">🏛️ <span className="font-medium">Numéro :</span> {userDetails.party}</p>
+        <p className="text-sm">🏛️ <span className="font-medium"></span> {userDetails.parti_politique}</p>
       </div>
         {/* Couleurs des Partis */}
       

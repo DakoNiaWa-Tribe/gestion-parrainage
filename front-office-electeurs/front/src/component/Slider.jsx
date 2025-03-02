@@ -12,8 +12,7 @@ import anime from "animejs";
 import CandidatCard from "./candidat";
 
 
-const Swippercarrousel= ({cardRef,candidats,setSelectedcandidat,setParainer,Parainer,isconnected})=>{
-  console.log("dans le carousell",isconnected)
+const Swippercarrousel= ({cardRef,Candidatss,setSelectedcandidat,setParainer,Parainer,isconnected})=>{
       return (
         <>
           <Swiper
@@ -22,9 +21,9 @@ const Swippercarrousel= ({cardRef,candidats,setSelectedcandidat,setParainer,Para
           grabCursor={true}
           centeredSlides={true}
           slidesPerView="auto"
-          loop={true}
+          loop={Candidatss?.candidats?.length > 2 ? true : false}
           autoplay={{
-            delay: 3000,
+            delay: 60000,
             disableOnInteraction: false,
           }}
           navigation={true}
@@ -42,26 +41,27 @@ const Swippercarrousel= ({cardRef,candidats,setSelectedcandidat,setParainer,Para
           modules={[EffectCoverflow, Autoplay, Navigation, Pagination, Mousewheel]}
         className="w-full max-w-5xl overflow-visible!  "
       >
-        {candidats.map((candidat, index) => (
-          <SwiperSlide key={index} className=" relative h-full w-[60%]!  ">
-            {/* <div className="relative w-full h-[70vh] rounded-xl shadow-lg overflow-hidden"
-            >
-              <img src={image} alt={`Slide ${index}`} className="w-full h-full object-cover" />
-              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-4">
-                <h2 className="text-white text-lg font-bold">Image {index + 1}</h2>
-              </div>
-            </div> */}
-           <CandidatCard userDetails={candidat} setSelectedcandidat={setSelectedcandidat} setParainer={setParainer}  Parainer={Parainer} isconnected={isconnected}/>
-
-
-          </SwiperSlide>
-        ))}
+        {Candidatss?.candidats?.length > 0 ? (
+  Candidatss.candidats.map((candidat, index) => (
+    <SwiperSlide key={index} className="relative h-full w-[60%]!">
+      <CandidatCard 
+        userDetails={candidat} 
+        setSelectedcandidat={setSelectedcandidat} 
+        setParainer={setParainer}  
+        Parainer={Parainer} 
+        isconnected={isconnected}
+      />
+    </SwiperSlide>
+  ))
+) : (
+  <p className="text-white">Aucun candidat disponible</p>
+)}
       </Swiper>
         </>
       )
 
 };
-const SwipperCards= ({cardRef,candidats,setSelectedcandidat,setParainer,Parainer,isconnected})=>{
+const SwipperCards= ({cardRef,Candidatss,setSelectedcandidat,setParainer,Parainer,isconnected})=>{
 
   return(
 
@@ -72,7 +72,7 @@ const SwipperCards= ({cardRef,candidats,setSelectedcandidat,setParainer,Parainer
         grabCursor={true}
         centeredSlides={true}
         slidesPerView="auto"
-        loop={true}
+        loop={Candidatss?.candidats?.length > 2 ? true : false}
         autoplay={{
           delay: 3000,
           disableOnInteraction: false,
@@ -82,18 +82,21 @@ const SwipperCards= ({cardRef,candidats,setSelectedcandidat,setParainer,Parainer
         modules={[Autoplay, Navigation, Pagination, Mousewheel, EffectCards]}
       className="w-full max-w-5xl overflow-visible!  "
     >
-      {candidats.map((candidat, index) => (
-        <SwiperSlide key={index} className=" relative h-full w-[60%]!  ">
-          {/* <div className="relative w-full h-[70vh] rounded-xl shadow-lg overflow-hidden"
-          >
-            <img src={image} alt={`Slide ${index}`} className="w-full h-full object-cover" />
-            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-4">
-              <h2 className="text-white text-lg font-bold">Image {index + 1}</h2>
-            </div>
-          </div> */}
-          <CandidatCard userDetails={candidat} setSelectedcandidat={setSelectedcandidat} setParainer={setParainer}  Parainer={Parainer} isconnected={isconnected}/>
-        </SwiperSlide>
-      ))}
+      {Candidatss?.candidats?.length > 0 ? (
+  Candidatss.candidats.map((candidat, index) => (
+    <SwiperSlide key={index} className="relative h-full w-[60%]!">
+      <CandidatCard 
+        userDetails={candidat} 
+        setSelectedcandidat={setSelectedcandidat} 
+        setParainer={setParainer}  
+        Parainer={Parainer} 
+        isconnected={isconnected}
+      />
+    </SwiperSlide>
+  ))
+) : (
+  <p className="text-white">Aucun candidat disponible</p>
+)}
     </Swiper>
 </>
   )
@@ -116,7 +119,6 @@ const Loader = () =>{
 
 const Swiper3DCarousel = ({mode,setParainer,setSelectedcandidat,Parainer,isconnected}) => {
    const baseRef = useRef(null);
-  const [candidats, setCandidats] = useState([]);
   const [Candidatss, setCandidatss] = useState([]);
   const [Load, setLoad] = useState(true);
   const [error, setError] = useState(null);
@@ -124,21 +126,30 @@ const Swiper3DCarousel = ({mode,setParainer,setSelectedcandidat,Parainer,isconne
   const fetchCandidates = async () => {
     setError("");
     try {
-      const response = await fetch("https://api.example.com/candidates"); // Remplace avec ton URL API
+      const response = await fetch("https://backend-fast-api-i1g8.onrender.com/candidat/all", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        mode: "cors", // Active CORS
+        credentials: "include", 
+      });
+  
       if (!response.ok) throw new Error("Erreur lors de la récupération des candidats");
+      console.log("connected to api")
       const data = await response.json();
-      setCandidatss(data); // Assure-toi que la réponse est bien un tableau
+      setCandidatss(data);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoad(false);
     }
   };
-
   
   useEffect(() => {
     fetchCandidates();
-  }, [Candidatss]);
+  }, []);
   useEffect(() => {
     anime({
             targets: cardRef.current, // Cible la div référencée
@@ -154,45 +165,12 @@ const Swiper3DCarousel = ({mode,setParainer,setSelectedcandidat,Parainer,isconne
     anime({
       targets: baseRef.current, // Cible la div référencée
       opacity: [0,1],
-      delay : 900,
-    duration: 600, // Durée de l'animation 
+      delay : 1200,
+    duration: 1900, // Durée de l'animation 
       easing: 'easeInOutQuad', // Animation fluide
     });
   }, [Load]);
-  useEffect(() => {
-    // Simuler une requête API avec des données de test
-    const mockData = [
-      {
-        firstName: "Jean",
-        lastName: "Dupont",
-        profilImg: "/img/tet1.png",
-        birthDate: "12/06/1980",
-        votingOffice: "Bureau 45",
-        party: 1,
-        slogan: "Un avenir meilleur pour tous !",
-      },
-      {
-        firstName: "Marie",
-        lastName: "Curie",
-        profilImg: "/img/tet.jpg",
-        birthDate: "07/11/1867",
-        votingOffice: "Bureau 12",
-        party: 2,
-        slogan: "Science et progrès !",
-      },
-      {
-        firstName: "Nelson",
-        lastName: "Mandela",
-        profilImg: "/img/tete-chat-profil_372268-573.jpg",
-        birthDate: "18/07/1918",
-        votingOffice: "Bureau 27",
-        party: 3,
-        slogan: "Liberté et justice !",
-      },
-    ];
-    
-    setTimeout(() => setCandidats(mockData), 1000); // Simulation du délai de chargement
-  }, []);
+  
   return (
     Load ? (
       <Loader />
@@ -201,9 +179,9 @@ const Swiper3DCarousel = ({mode,setParainer,setSelectedcandidat,Parainer,isconne
         ref={baseRef}
         className="flex items-center justify-center w-full h-full !overflow-visible bg-gray-900">
         {mode === "carrousel" ? (
-          <Swippercarrousel cardRef={cardRef} candidats={candidats} setSelectedcandidat={setSelectedcandidat} setParainer={setParainer} Parainer={Parainer} isconnected={isconnected} />
+          <Swippercarrousel cardRef={cardRef} Candidatss={Candidatss} setSelectedcandidat={setSelectedcandidat} setParainer={setParainer} Parainer={Parainer} isconnected={isconnected} />
         ) : (
-          <SwipperCards cardRef={cardRef} candidats={candidats} setSelectedcandidat={setSelectedcandidat} setParainer={setParainer} Parainer={Parainer} isconnected={isconnected}  />
+          <SwipperCards cardRef={cardRef} Candidatss={Candidatss} setSelectedcandidat={setSelectedcandidat} setParainer={setParainer} Parainer={Parainer} isconnected={isconnected}  />
         )}
       </div>
       : 

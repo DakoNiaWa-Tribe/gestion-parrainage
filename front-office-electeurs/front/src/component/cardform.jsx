@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 
 
-const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,setZone,Zone}) => {
+const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,setZone,Zone , setElecteur}) => {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -43,7 +43,7 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
     setSuccess(false);
     console.log(formDatainscrip);
     try {
-      const response = await fetch("https://api.example.com/auth/signup", {
+      const response = await fetch("https://backend-fast-api-i1g8.onrender.com/electeur/parrain-registration/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formDatainscrip),
@@ -53,6 +53,7 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
 
       if (response.ok && data.success) {
         setSuccess(true);
+        setElecteur(data);
         setPart(!Part);
       } else {
         setError(data.message || "Échec de l'inscription.");
@@ -71,7 +72,7 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
     setZone("connexion");
 
     try {
-      const response = await fetch("https://api.example.com/auth/signup", {
+      const response = await fetch("https://backend-fast-api-i1g8.onrender.com//electeur/get_otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formDataconnexion),
@@ -299,7 +300,7 @@ const InscriptionPart2 = ({formRef}) => {
     setSuccess(false);
 
     try {
-      const response = await fetch("https://api.example.com/auth/signup", {
+      const response = await fetch("https://backend-fast-api-i1g8.onrender.com/electeur/confirmation_parrain_registration/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData), // Envoi des données en JSON
@@ -398,7 +399,7 @@ const InscriptionPart2 = ({formRef}) => {
         </>
   );
 };
-  const Connectionpart2 = ({ formRef , isconnected , setIsconnected }) => {
+  const Connectionpart2 = ({ formRef , isconnected , setIsconnected,Electeur }) => {
     const [authCode, setAuthCode] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -408,17 +409,15 @@ const InscriptionPart2 = ({formRef}) => {
 
 
 
-    const fetchUserDetails = async () => {
+    const fetchUserDetails = async ( Electeur) => {
       try {
-        const response = await fetch(`https://api.example.com/users/`);
-        const data = await response.json();
-        if (response.ok) {
+        if (Electeur!=null) {
           const user = {
-            nom_famille: data.nom_famille,
-            numero_id_national: data.numero_id_national,
-            numero_electeur: data.numero_electeur,
-            numero_bureau: data.numero_bureau,
-            date_naissance: data.date_naissance,
+            nom_famille: Electeur.nom_famille,
+            numero_id_national: Electeur.numero_id_national,
+            numero_electeur: Electeur.numero_electeur,
+            numero_bureau: Electeur.numero_bureau,
+            date_naissance: Electeur.date_naissance,
           };
           setUserDetails(user);
           localStorage.setItem("userDetails", JSON.stringify(user));
@@ -458,12 +457,11 @@ const InscriptionPart2 = ({formRef}) => {
       const payload = {
         numero_id_national: userDetails.numero_id_national,
         numero_electeur: userDetails.numero_electeur,
-        numero_bureau: userDetails.numero_bureau,
         code_auth: authCode, // Le code d'authentification entré par l'utilisateur
       };
   
       try {
-        const response = await fetch("https://api.example.com/auth/validate-code", {
+        const response = await fetch("https://backend-fast-api-i1g8.onrender.com/electeur/auth", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -546,10 +544,10 @@ const InscriptionPart2 = ({formRef}) => {
     );
   };
 
-const Postinscription = ({formRef , Zone, userDetails, isconnected,setIsconnected}) => {
+const Postinscription = ({formRef , Zone, userDetails, isconnected,setIsconnected ,Electeur}) => {
   return (
         <>
-          {Zone === "connection" ? <Connectionpart2 formRef={formRef} userDetails={userDetails} isconnected={isconnected} setIsconnected={setIsconnected}/> : <InscriptionPart2 formRef={formRef}/>}
+          {Zone === "connection" ? <Connectionpart2 formRef={formRef} userDetails={userDetails} isconnected={isconnected} setIsconnected={setIsconnected} Electeur={Electeur} /> : <InscriptionPart2 formRef={formRef}/>}
    
         </>
   );
@@ -558,6 +556,13 @@ const Postinscription = ({formRef , Zone, userDetails, isconnected,setIsconnecte
 const CardForm = ({isconnected,setIsconnected}) => {
   const [Zone, setZone] = useState("connection");
   const [isSignUp, setIsSignUp] = useState(false);
+  const [Electeur, setElecteur] = useState({
+    nom_famille: "",
+    numero_id_national: "",
+    numero_electeur: "",
+    numero_bureau: "",
+    date_naissance:""
+  });
   const [part, setPart] = useState(true);
   const cardRef = useRef(null);
   const Zoomref = useRef(null);
