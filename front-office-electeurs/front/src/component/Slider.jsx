@@ -12,11 +12,12 @@ import anime from "animejs";
 import CandidatCard from "./candidat";
 
 
-const Swippercarrousel= ({cardRef,candidats})=>{
+const Swippercarrousel= ({cardRef,candidats,setSelectedcandidat,setParainer,Parainer,isconnected})=>{
+  console.log("dans le carousell",isconnected)
       return (
         <>
           <Swiper
-    ref={cardRef}
+          ref={cardRef}
           effect="coverflow"
           grabCursor={true}
           centeredSlides={true}
@@ -50,7 +51,8 @@ const Swippercarrousel= ({cardRef,candidats})=>{
                 <h2 className="text-white text-lg font-bold">Image {index + 1}</h2>
               </div>
             </div> */}
-          <CandidatCard userDetails={candidat} />
+           <CandidatCard userDetails={candidat} setSelectedcandidat={setSelectedcandidat} setParainer={setParainer}  Parainer={Parainer} isconnected={isconnected}/>
+
 
           </SwiperSlide>
         ))}
@@ -59,7 +61,8 @@ const Swippercarrousel= ({cardRef,candidats})=>{
       )
 
 };
-const SwipperCards= ({cardRef,candidats})=>{
+const SwipperCards= ({cardRef,candidats,setSelectedcandidat,setParainer,Parainer,isconnected})=>{
+
   return(
 
     <>
@@ -88,7 +91,7 @@ const SwipperCards= ({cardRef,candidats})=>{
               <h2 className="text-white text-lg font-bold">Image {index + 1}</h2>
             </div>
           </div> */}
-          <CandidatCard userDetails={candidat} />
+          <CandidatCard userDetails={candidat} setSelectedcandidat={setSelectedcandidat} setParainer={setParainer}  Parainer={Parainer} isconnected={isconnected}/>
         </SwiperSlide>
       ))}
     </Swiper>
@@ -111,11 +114,31 @@ const Loader = () =>{
   </>
 }
 
-const Swiper3DCarousel = ({mode}) => {
-
+const Swiper3DCarousel = ({mode,setParainer,setSelectedcandidat,Parainer,isconnected}) => {
+   const baseRef = useRef(null);
   const [candidats, setCandidats] = useState([]);
+  const [Candidatss, setCandidatss] = useState([]);
   const [Load, setLoad] = useState(true);
+  const [error, setError] = useState(null);
   const cardRef =useRef(null);
+  const fetchCandidates = async () => {
+    setError("");
+    try {
+      const response = await fetch("https://api.example.com/candidates"); // Remplace avec ton URL API
+      if (!response.ok) throw new Error("Erreur lors de la récupération des candidats");
+      const data = await response.json();
+      setCandidatss(data); // Assure-toi que la réponse est bien un tableau
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoad(false);
+    }
+  };
+
+  
+  useEffect(() => {
+    fetchCandidates();
+  }, [Candidatss]);
   useEffect(() => {
     anime({
             targets: cardRef.current, // Cible la div référencée
@@ -125,7 +148,17 @@ const Swiper3DCarousel = ({mode}) => {
             easing: 'easeInOutQuad', // Animation fluide
           });
     
-  }, [mode]);
+  }, [mode]); 
+  
+  useEffect(() => {
+    anime({
+      targets: baseRef.current, // Cible la div référencée
+      opacity: [0,1],
+      delay : 900,
+    duration: 600, // Durée de l'animation 
+      easing: 'easeInOutQuad', // Animation fluide
+    });
+  }, [Load]);
   useEffect(() => {
     // Simuler une requête API avec des données de test
     const mockData = [
@@ -160,25 +193,28 @@ const Swiper3DCarousel = ({mode}) => {
     
     setTimeout(() => setCandidats(mockData), 1000); // Simulation du délai de chargement
   }, []);
-
- 
-  useEffect(() => {
-    if (candidats.length > 0) {
-      setLoad(false);
-    }
-  }, [candidats]);
-
   return (
     Load ? (
       <Loader />
-    ) : (
-      <div className="flex items-center justify-center w-full h-full !overflow-visible bg-gray-900">
+    ) : ( error != null ?  
+      <div 
+        ref={baseRef}
+        className="flex items-center justify-center w-full h-full !overflow-visible bg-gray-900">
         {mode === "carrousel" ? (
-          <Swippercarrousel cardRef={cardRef} candidats={candidats} />
+          <Swippercarrousel cardRef={cardRef} candidats={candidats} setSelectedcandidat={setSelectedcandidat} setParainer={setParainer} Parainer={Parainer} isconnected={isconnected} />
         ) : (
-          <SwipperCards cardRef={cardRef} candidats={candidats} />
+          <SwipperCards cardRef={cardRef} candidats={candidats} setSelectedcandidat={setSelectedcandidat} setParainer={setParainer} Parainer={Parainer} isconnected={isconnected}  />
         )}
       </div>
+      : 
+      <div
+      id="alert-box"
+      className={`p-3 rounded-lg mb-4 ${
+       'bg-red-100 text-red-600'
+      }`}
+    >
+      {error}
+    </div>
     )
   );
 };

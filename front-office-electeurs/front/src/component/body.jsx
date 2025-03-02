@@ -23,37 +23,38 @@ const Butlog = () => {
   );
 };
 
-const Profil = ({ name, profilImg }) => {
+const Profil = ({isconnectedA,setIsconnectedA}) => {
+  const disconnect = () =>{
+    console.log("clickde");
+    setIsconnectedA(false); 
+  localStorage.removeItem("user");
+}
   return (
     <>
-      <div className="flex gap-4 justify-center items-center">
-        <NavLink to="/login">
-          <span>{name}</span>
-        </NavLink>
-        <NavLink
-          to="/login"
-          className="w-12 h-12 rounded-full overflow-hidden hover:scale-110 transition-transform ease-in"
-        >
-          <span className="w-full h-full bg-amber-400 block">
-            <img
-              src={profilImg}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-          </span>
-        </NavLink>
-      </div>
+            <div className="flex gap-4 justify-center items-center p-4 rounded-lg shadow-md">
+         
+          <button 
+            className="bg-blue-600 text-white px-5 py-2 cursor-pointer rounded-lg shadow-lg hover:bg-blue-700 active:scale-95 transition-all duration-300 ease-in-out"
+            onClick={disconnect}
+          >
+            Déconnexion
+          </button>
+        </div>
+
     </>
   );
 };
 
-function Layout({ children }) {
-  const name = "Samba";
-  const profilImg = "img/tete-chat-profil_372268-573.jpg";
+function Layout({ children, isconnectedA, setIsconnectedA }) {
+  console.log(isconnectedA);
   // eslint-disable-next-line no-unused-vars
-  const [isconnected, setIsconnected] = useState(false);
   const headerRef = useRef(null);
   const footerRef = useRef(null);
+
+   useEffect(() => {
+    console.log("isconnected mis à jour :", isconnectedA);
+}, [isconnectedA]);
+
 
   useEffect(() => {
         anime({
@@ -69,6 +70,11 @@ function Layout({ children }) {
           easing: 'easeInOutQuad', // Animation fluide
         });
       }, []);
+      const [user, setUser] = useState(() => {
+        // Vérifier si une valeur existe dans le localStorage
+        const storedUser = localStorage.getItem("user");
+        return storedUser ? JSON.parse(storedUser) : { nom_famille: "unknown" };
+      });
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -88,15 +94,14 @@ function Layout({ children }) {
           
           {/* Navigation - cachée sur petits écrans */}
           <nav className="hidden md:flex gap-6">
-            <a href="#" className="hover:text-gray-200">À propos</a>
-            <a href="#" className="hover:text-gray-200">Contact</a>
+             {isconnectedA ? ( <span className="text-lg font-semibold text-gray-700 px-3 py-1 bg-gray-200 rounded-md">
+            {user.nom_famille}
+          </span>) : null}
           </nav>
 
           {/* Profil / Connexion / Inscription */}
           <div className="flex gap-4 items-center">
-            {isconnected ? (
-              <Profil name={name} profilImg={profilImg} />
-            ) : (
+            {isconnectedA ? <Profil isconnectedA={isconnectedA} setIsconnectedA={setIsconnectedA} />: (
               <Butlog />
             )}
           </div>

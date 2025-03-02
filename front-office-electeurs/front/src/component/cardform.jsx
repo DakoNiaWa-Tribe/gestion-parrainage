@@ -3,10 +3,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import anime from "animejs";
+import { useNavigate } from "react-router-dom";
 
 
 
-const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,setZone,Zone }) => {
+const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,setZone,Zone}) => {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -92,6 +93,7 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
   };
 
 
+
   return (
 
         <>
@@ -162,6 +164,7 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
       >
         Pas encore de compte ? Inscrivez-vous
       </button>
+    
     </form>
         </div>
         {/* Signup Form */}
@@ -280,6 +283,7 @@ const InscriptionPart2 = ({formRef}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -305,6 +309,7 @@ const InscriptionPart2 = ({formRef}) => {
 
       if (response.ok && data.success) {
         setSuccess(true);
+        navigate('/login');
         console.log("Inscription réussie !");
       } else {
         setError(data.message || "Échec de l'inscription.");
@@ -393,12 +398,13 @@ const InscriptionPart2 = ({formRef}) => {
         </>
   );
 };
-  const Connectionpart2 = ({ formRef }) => {
+  const Connectionpart2 = ({ formRef , isconnected , setIsconnected }) => {
     const [authCode, setAuthCode] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
     const [userDetails, setUserDetails] = useState(null);
+    const navigate = useNavigate();
 
 
 
@@ -406,15 +412,16 @@ const InscriptionPart2 = ({formRef}) => {
       try {
         const response = await fetch(`https://api.example.com/users/`);
         const data = await response.json();
-
         if (response.ok) {
-          setUserDetails({
+          const user = {
             nom_famille: data.nom_famille,
             numero_id_national: data.numero_id_national,
             numero_electeur: data.numero_electeur,
             numero_bureau: data.numero_bureau,
             date_naissance: data.date_naissance,
-          });
+          };
+          setUserDetails(user);
+          localStorage.setItem("userDetails", JSON.stringify(user));
         } else {
           setError("Impossible de récupérer les informations utilisateur.");
         }
@@ -467,6 +474,8 @@ const InscriptionPart2 = ({formRef}) => {
         if (response.ok && data.success) {
           setSuccess(true);
           console.log("Authentification réussie !");
+          setIsconnected(true);
+          navigate("/");
         } else {
           setError(data.message || "Échec de l'authentification.");
         }
@@ -537,19 +546,19 @@ const InscriptionPart2 = ({formRef}) => {
     );
   };
 
-const Postinscription = ({formRef , Zone, userDetails}) => {
+const Postinscription = ({formRef , Zone, userDetails, isconnected,setIsconnected}) => {
   return (
         <>
-          {Zone === "connection" ? <Connectionpart2 formRef={formRef} userDetails={userDetails}/> : <InscriptionPart2 formRef={formRef}/>}
+          {Zone === "connection" ? <Connectionpart2 formRef={formRef} userDetails={userDetails} isconnected={isconnected} setIsconnected={setIsconnected}/> : <InscriptionPart2 formRef={formRef}/>}
    
         </>
   );
 };
 
-const CardForm = () => {
-  const [Zone, setZone] = useState("connectio");
+const CardForm = ({isconnected,setIsconnected}) => {
+  const [Zone, setZone] = useState("connection");
   const [isSignUp, setIsSignUp] = useState(false);
-  const [part, setPart] = useState(false);
+  const [part, setPart] = useState(true);
   const cardRef = useRef(null);
   const Zoomref = useRef(null);
   const formRef = useRef(null);
@@ -596,9 +605,9 @@ const CardForm = () => {
       >
 
         {part ? (
-          <Preinscription isSignUp={isSignUp} handleToggleClick={handleToggleClick} formRef={formRef} setPart={setPart} Part={part}  setZone={setZone} Zone={Zone}/>
+          <Preinscription isSignUp={isSignUp} handleToggleClick={handleToggleClick} formRef={formRef} setPart={setPart} Part={part}  setZone={setZone} Zone={Zone} />
         ) : (
-          <Postinscription formRef={formRef} Zone={Zone} />
+          <Postinscription formRef={formRef} Zone={Zone} isconnected={isconnected} setIsconnected={setIsconnected} />
         )}
          
       </div>

@@ -7,9 +7,11 @@ import "swiper/css/autoplay";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import anime from "animejs";
+import {useNavigate } from "react-router-dom";
 
-const CandidatCard = ({ userDetails }) => {
+const CandidatCard = ({ userDetails,setSelectedcandidat,setParainer,Parainer,isconnected }) => {
   const cardRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (userDetails) {
@@ -22,6 +24,18 @@ const CandidatCard = ({ userDetails }) => {
       });
     }
   }, [userDetails]);
+
+  const handleClick = (userDetails) => {
+    setSelectedcandidat(userDetails)
+    setParainer(!Parainer);
+    console.log(userDetails);
+    console.log(Parainer);
+  };
+
+  const pushlog= () =>{
+      navigate("/login");
+      console.log("is cliked");
+  }
 
   return (
     <>
@@ -70,6 +84,7 @@ const CandidatCard = ({ userDetails }) => {
       <div className="relative group mb-4 mt-3">
         <button
           className="relative inline-block p-px font-semibold leading-6 text-white bg-neutral-600 shadow-2xl cursor-pointer rounded-2xl shadow-emerald-900 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:shadow-emerald-600"
+          onClick={isconnected ? (() => handleClick(userDetails)) : pushlog}
         >
           <span
             className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500 via-cyan-500 to-sky-600 p-[2px] opacity-0 transition-opacity duration-500 group-hover:opacity-100"

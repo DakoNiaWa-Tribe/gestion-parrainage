@@ -1,18 +1,24 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
 import Layout from "../component/body"
 import Swiper3DCarousel from "../component/Slider";
 import anime from "animejs";
+import ConfirmationParrainage from "../component/confirmparain";
+import { useAuth } from "../context/authContext";
 
 
 
 function Accueil() {
-
+  const { isconnected, setIsconnected } = useAuth();
+  const [isconnectedA, setconnectedA ] = useState(isconnected);
 
       const [mode, setmode] = useState("carrousel");
+      const [Parainer, setParainer] = useState(true);
       const buttonRef = useRef(null);
       const buttonRef1 = useRef(null);
       const buttonRef2= useRef(null);
-    
+      const confirmation= useRef(null);
+      const [selectedcandidat, setSelectedcandidat] = useState([]);
       useEffect(() => {
         anime({
           targets: buttonRef.current?.children,
@@ -22,6 +28,22 @@ function Accueil() {
           delay: anime.stagger(200),
         });
       }, []);
+      
+      useEffect(() => {
+        setIsconnected(isconnectedA);
+        
+      }, [isconnectedA]);
+
+    useEffect(() => {
+        anime({
+          targets: confirmation.current,
+          opacity: [0,1],
+          duration: 1600,
+          easing: "easeOutElastic",
+         
+        });
+      }, [Parainer]);
+      console.log(selectedcandidat); 
     
       const handleCarrouselClick = () => {
         setmode("carrousel");
@@ -45,11 +67,18 @@ function Accueil() {
         });
       };
       console.log(mode);
-    
 
+      console.log(`is connected global :`, isconnected);
+      console.log(`is connected local :`, isconnectedA);
+      const handleConfirm = (code) => {
+        console.log(`Code de confirmation pour ${selectedcandidat} :`, code);
+        Parainer(false);
+      };
+     
   return (
     <>
-      <Layout>
+      <Layout  isconnectedA={isconnectedA}  setIsconnectedA ={setconnectedA}   >
+      
             <div className=" w-full flex flex-col justify-center items-center min-h-full   ">
               <div ref={buttonRef}  className="flex absolute left-8 top-20 z-10">
 
@@ -101,8 +130,21 @@ function Accueil() {
                 </button>
 
               </div>
-              <Swiper3DCarousel mode={mode} />
-              {/* <CandidatCard/> */}
+              <Swiper3DCarousel mode={mode} setParainer={setParainer} Parainer={Parainer} setSelectedcandidat={setSelectedcandidat} isconnected={isconnectedA}  />
+
+               {Parainer ? 
+               null
+              
+               :
+               <ConfirmationParrainage
+               confirmation={confirmation}
+               selectedcandidat={selectedcandidat}
+               setParainer={setParainer}
+                onConfirm={handleConfirm}
+              />
+        }
+
+
             </div>
       </Layout>
     </>

@@ -1,26 +1,20 @@
+import './App.css';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Accueil from './pages/Accueil';
+import Login from './pages/login';
+import { AuthProvider } from './context/authContext'; // Import du contexte
 
-import './App.css'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import Accueil from './pages/Accueil'
-import Login from './pages/login'
+const router = createBrowserRouter([
+  { path: '/', element: <Accueil /> },
+  { path: '/login', element: <Login /> }
+]);
 
-//ramataaaaaaaaa
+const App = () => {
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
+};
 
-function App() {
-
-  const router= createBrowserRouter([
-
-    {
-      path:'/',
-      element: <Accueil/>
-    },
-    {
-      path: '/login',
-      element: <Login/>
-    }
-  ])
-
-  return <RouterProvider router={router}/>
-}
-
-export default App
+export default App;
