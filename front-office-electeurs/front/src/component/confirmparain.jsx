@@ -14,7 +14,8 @@ const ConfirmationParrainage = ({ selectedcandidat, setParainer, Parainer, onCon
 
     // Récupérer les détails de l'utilisateur depuis localStorage
     const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-    console.log("userdetails info", userDetails)
+    console.log("userdetails info", userDetails);
+    console.log("candidat  info", selectedcandidat);
     const numeroElecteur = userDetails?.numero_electeur; // Vérifie si userDetails existe
 
     if (!numeroElecteur) {
@@ -24,14 +25,14 @@ const ConfirmationParrainage = ({ selectedcandidat, setParainer, Parainer, onCon
 
     setLoading(true);
     try {
-      const response = await fetch("https://api.example.com/parrainage", {
+      const response = await fetch("https://backend-fast-api-i1g8.onrender.com/electeur/valider_parrainage", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          code: codeConfirmation,
-          candidatId: selectedcandidat.id,
+          code_otp: codeConfirmation,
+          id_candidat: selectedcandidat.id,
           numero_electeur: numeroElecteur, // Utilisation de la valeur du localStorage
         }),
       });
@@ -68,7 +69,7 @@ const ConfirmationParrainage = ({ selectedcandidat, setParainer, Parainer, onCon
 
         <div className="bg-gray-100 p-3 rounded-md text-center mb-4 shadow-sm">
           <p className="text-lg font-medium">Candidat :</p>
-          <p className="text-xl font-bold text-blue-600">{selectedcandidat.firstName}</p>
+          <p className="text-xl font-bold text-blue-600">{selectedcandidat.prenom} {selectedcandidat.nom}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -76,7 +77,7 @@ const ConfirmationParrainage = ({ selectedcandidat, setParainer, Parainer, onCon
           <input
             type="text"
             maxLength="13"
-            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow uppercase"
             placeholder="Entrez le code"
             value={codeConfirmation}
             onChange={(e) => setCodeConfirmation(e.target.value)}

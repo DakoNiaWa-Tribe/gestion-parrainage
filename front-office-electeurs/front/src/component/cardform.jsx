@@ -7,21 +7,12 @@ import { useNavigate } from "react-router-dom";
 
 
 
-const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,setZone,Zone , setElecteur}) => {
+const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,setZone,Zone , setElecteur , formDataconnexion, setFormDataconnexion , formDatainscrip, setFormDatainscrip}) => {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [formDatainscrip, setFormDatainscrip] = useState({
-    nom_famille: "",
-    numero_id_national: "",
-    numero_electeur: "",
-    numero_bureau: "",
-  });
-  const [formDataconnexion, setFormDataconnexion] = useState({
-    numero_electeur: "",
-    numero_id_national: "",
-  });
+
   const handleChangeconnexion = (e) => {
     setFormDataconnexion({
       ...formDataconnexion,
@@ -43,7 +34,7 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
     setSuccess(false);
     console.log(formDatainscrip);
     try {
-      const response = await fetch("https://backend-fast-api-i1g8.onrender.com/electeur/parrain-registration/", {
+      const response = await fetch("https://backend-fast-api-i1g8.onrender.com/electeur/check_parrain_registration/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formDatainscrip),
@@ -51,12 +42,11 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
+      if (response.ok) {
         setSuccess(true);
-        setElecteur(data);
         setPart(!Part);
       } else {
-        setError(data.message || "Échec de l'inscription.");
+        setError(data.message  || "Échec de l'inscription.");
       }
     } catch (err) {
       setError("Erreur de connexion au serveur.");
@@ -71,8 +61,9 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
     console.log(formDataconnexion);
     setZone("connexion");
 
+    
     try {
-      const response = await fetch("https://backend-fast-api-i1g8.onrender.com//electeur/get_otp", {
+      const response = await fetch("https://backend-fast-api-i1g8.onrender.com/electeur/check_auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formDataconnexion),
@@ -80,9 +71,12 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
+      if (response.ok) {
+        console.log("response ok data: ",data.data[0])
         setSuccess(true);
+        setElecteur(data.data[0]);
         setPart(!Part);
+        console.log("Zone :",Part)
       } else {
         setError(data.message || "Échec de l'inscription.");
       }
@@ -142,8 +136,8 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
           className="w-full p-2 rounded border border-gray-300"
           value={formDataconnexion.numero_electeur}
           onChange={handleChangeconnexion}
-          minLength={17}
-          maxLength={17}
+          minLength={9}
+          maxLength={9}
           required
         />
       </div>
@@ -228,8 +222,8 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
           className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300"
           value={formDatainscrip.numero_electeur}
           onChange={handleChangeinscrip}
-          minLength={17}
-          maxLength={17}
+          minLength={9}
+          maxLength={9}
           required
         />
       </div>
@@ -273,12 +267,15 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
 };
 
 
-const InscriptionPart2 = ({formRef}) => {
+const InscriptionPart2 = ({formRef , formDatainscrip,setPart,Part }) => {
   
   const [formData, setFormData] = useState({
-    numero_id_national: "",
+    numero_id_national: formDatainscrip.numero_id_national,
     numero_tel: "",
     adresse_mail: "",
+    nom: formDatainscrip.nom_famille,
+    numero_electeur: formDatainscrip.numero_electeur,
+    numero_bureau: formDatainscrip.numero_bureau,
   });
 
   const [loading, setLoading] = useState(false);
@@ -308,9 +305,13 @@ const InscriptionPart2 = ({formRef}) => {
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
+      if (response.ok) {
         setSuccess(true);
-        navigate('/login');
+        setTimeout(() => {
+          navigate('/login');
+          setPart(!Part);
+        }, 2000);
+
         console.log("Inscription réussie !");
       } else {
         setError(data.message || "Échec de l'inscription.");
@@ -338,7 +339,7 @@ const InscriptionPart2 = ({formRef}) => {
         {/* Signup Form */}
         <div
           ref={formRef}
-          className={`absolute w-full   p-6 bg-white rounded-xl shadow-xl transition-opacity `}
+          className={`absolute w-full   p-6 bg-white rounded-xl shadow-xl transition-opacity rotate-y-180 `}
         >
             <div className="h-15 flex justify-center"> 
                     <img src="img/logo.png" alt="" className="w-15 h-15" />       
@@ -367,7 +368,7 @@ const InscriptionPart2 = ({formRef}) => {
           required
         />
       </div>
-      <div>
+      {/* <div>
         <label className="block text-gray-600 text-sm mb-1">Numéro de carte d’identité nationale</label>
         <input
           type="text"
@@ -379,7 +380,7 @@ const InscriptionPart2 = ({formRef}) => {
           maxLength={17}
           required
         />
-      </div>
+      </div> */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
       {success && <p className="text-green-500 text-sm">Inscription réussie !</p>}
       <button
@@ -399,40 +400,13 @@ const InscriptionPart2 = ({formRef}) => {
         </>
   );
 };
-  const Connectionpart2 = ({ formRef , isconnected , setIsconnected,Electeur }) => {
-    const [authCode, setAuthCode] = useState("");
+  const Connectionpart2 = ({ formRef , isconnected , setIsconnected,Electeur,userDetails}) => {
+    const [authCode, setAuthCode] = useState("");  
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
-    const [userDetails, setUserDetails] = useState(null);
     const navigate = useNavigate();
 
-
-
-    const fetchUserDetails = async ( Electeur) => {
-      try {
-        if (Electeur!=null) {
-          const user = {
-            nom_famille: Electeur.nom_famille,
-            numero_id_national: Electeur.numero_id_national,
-            numero_electeur: Electeur.numero_electeur,
-            numero_bureau: Electeur.numero_bureau,
-            date_naissance: Electeur.date_naissance,
-          };
-          setUserDetails(user);
-          localStorage.setItem("userDetails", JSON.stringify(user));
-        } else {
-          setError("Impossible de récupérer les informations utilisateur.");
-        }
-      } catch (err) {
-        setError("Erreur de connexion au serveur.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    useEffect(() => {
-      fetchUserDetails();
-    }, []); 
   
     useEffect(() => {
       anime({
@@ -457,7 +431,7 @@ const InscriptionPart2 = ({formRef}) => {
       const payload = {
         numero_id_national: userDetails.numero_id_national,
         numero_electeur: userDetails.numero_electeur,
-        code_auth: authCode, // Le code d'authentification entré par l'utilisateur
+        code_securite: authCode, // Le code d'authentification entré par l'utilisateur
       };
   
       try {
@@ -469,7 +443,7 @@ const InscriptionPart2 = ({formRef}) => {
   
         const data = await response.json();
   
-        if (response.ok && data.success) {
+        if (response.ok) {
           setSuccess(true);
           console.log("Authentification réussie !");
           setIsconnected(true);
@@ -499,8 +473,8 @@ const InscriptionPart2 = ({formRef}) => {
   
         <div className="text-gray-800 bg-gray-100 p-4 rounded-lg mb-6 shadow-sm">
           <p className="text-lg font-medium">
-            Nom : <span className="font-semibold">{userDetails.nom_famille}</span>
-          </p>
+            Nom : <span className="font-semibold">{userDetails.prenom} {userDetails.nom}</span>
+          </p> 
           <p className="text-lg font-medium">
             Date de naissance : <span className="font-semibold">{userDetails.date_naissance}</span>
           </p>
@@ -519,7 +493,7 @@ const InscriptionPart2 = ({formRef}) => {
               name="code_auth"
               value={authCode}
               onChange={handleChange}
-              className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+              className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow uppercase"
               placeholder="Entrez votre code"
               required
             />
@@ -529,44 +503,83 @@ const InscriptionPart2 = ({formRef}) => {
           {success && <p className="text-green-500 text-sm">Connexion validée !</p>}
   
           <button
-            className="bg-blue-600 text-white w-full p-3 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors shadow-md disabled:bg-gray-400"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
+          className="bg-blue-600 text-white w-full p-3 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors shadow-md disabled:bg-gray-400 flex justify-center items-center gap-2"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
               <span className="animate-spin rounded-full h-5 w-5 border-t-2 border-white border-solid"></span>
-            ) : (
-              "Valider"
-            )}
-          </button>
+              Validation...
+            </>
+          ) : (
+            "Valider"
+          )}
+        </button>
         </form>
       </div>
     );
   };
 
-const Postinscription = ({formRef , Zone, userDetails, isconnected,setIsconnected ,Electeur}) => {
+const Postinscription = ({formRef , Zone, userDetails, isconnected,setIsconnected ,Electeur, formDatainscrip}) => {
   return (
         <>
-          {Zone === "connection" ? <Connectionpart2 formRef={formRef} userDetails={userDetails} isconnected={isconnected} setIsconnected={setIsconnected} Electeur={Electeur} /> : <InscriptionPart2 formRef={formRef}/>}
+          {Zone === "connexion" ? <Connectionpart2 formRef={formRef} userDetails={userDetails} isconnected={isconnected} setIsconnected={setIsconnected} Electeur={Electeur} /> : <InscriptionPart2 formRef={formRef} formDatainscrip={formDatainscrip} />}
    
         </>
   );
 };
 
 const CardForm = ({isconnected,setIsconnected}) => {
-  const [Zone, setZone] = useState("connection");
+  const [Zone, setZone] = useState("connexion");
   const [isSignUp, setIsSignUp] = useState(false);
   const [Electeur, setElecteur] = useState({
+    nom: "",
+    prenom: "",
+    cni: "",
+    numero_electeur: "",
+    bureau_vote: "",
+    date_naissance:""
+  });
+  const [formDatainscrip, setFormDatainscrip] = useState({
     nom_famille: "",
     numero_id_national: "",
     numero_electeur: "",
     numero_bureau: "",
-    date_naissance:""
+  });
+  const [formDataconnexion, setFormDataconnexion] = useState({
+    numero_electeur: "",
+    numero_id_national: "",
   });
   const [part, setPart] = useState(true);
   const cardRef = useRef(null);
   const Zoomref = useRef(null);
   const formRef = useRef(null);
+  const [userDetails, setUserDetails] = useState(null);
+
+
+
+  const fetchUserDetails = () => {
+    try {
+      if (Electeur) {
+        const user = {
+          nom: Electeur.nom,
+          prenom: Electeur.prenom,
+          numero_id_national: Electeur.cni,
+          numero_electeur: Electeur.numero_electeur,
+          numero_bureau: Electeur.bureau_vote,
+          date_naissance: Electeur.date_naissance,
+        };
+        setUserDetails(user);
+        localStorage.setItem("userDetails", JSON.stringify(user));
+      } 
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  useEffect(() => {
+    fetchUserDetails();
+  }, [Electeur]); 
 
     useEffect(() => {
       anime({
@@ -610,9 +623,9 @@ const CardForm = ({isconnected,setIsconnected}) => {
       >
 
         {part ? (
-          <Preinscription isSignUp={isSignUp} handleToggleClick={handleToggleClick} formRef={formRef} setPart={setPart} Part={part}  setZone={setZone} Zone={Zone} />
+          <Preinscription isSignUp={isSignUp} handleToggleClick={handleToggleClick} formRef={formRef} setPart={setPart} Part={part}  setZone={setZone} Zone={Zone} Electeur={Electeur} setElecteur={setElecteur}  formDatainscrip={formDatainscrip} setFormDatainscrip={setFormDatainscrip} formDataconnexion={formDataconnexion} setFormDataconnexion={setFormDataconnexion}/>
         ) : (
-          <Postinscription formRef={formRef} Zone={Zone} isconnected={isconnected} setIsconnected={setIsconnected} />
+          <Postinscription formRef={formRef} Zone={Zone} isconnected={isconnected} setIsconnected={setIsconnected} formDatainscrip={formDatainscrip} Electeur={Electeur} userDetails={userDetails} />
         )}
          
       </div>

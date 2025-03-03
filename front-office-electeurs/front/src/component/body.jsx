@@ -27,7 +27,7 @@ const Profil = ({isconnectedA,setIsconnectedA}) => {
   const disconnect = () =>{
     console.log("clickde");
     setIsconnectedA(false); 
-  localStorage.removeItem("user");
+  localStorage.removeItem("userDetails");
 }
   return (
     <>
@@ -72,9 +72,10 @@ function Layout({ children, isconnectedA, setIsconnectedA }) {
       }, []);
       const [user, setUser] = useState(() => {
         // Vérifier si une valeur existe dans le localStorage
-        const storedUser = localStorage.getItem("user");
-        return storedUser ? JSON.parse(storedUser) : { nom_famille: "unknown" };
+        const storedUser = localStorage.getItem("userDetails");
+        return storedUser ? JSON.parse(storedUser) : { nom: "unknown" };
       });
+      console.log(user)
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -95,7 +96,7 @@ function Layout({ children, isconnectedA, setIsconnectedA }) {
           {/* Navigation - cachée sur petits écrans */}
           <nav className="hidden md:flex gap-6">
              {isconnectedA ? ( <span className="text-lg font-semibold text-gray-700 px-3 py-1 bg-gray-200 rounded-md">
-            {user.nom_famille}
+            {user.prenom} {user.nom}
           </span>) : null}
           </nav>
 

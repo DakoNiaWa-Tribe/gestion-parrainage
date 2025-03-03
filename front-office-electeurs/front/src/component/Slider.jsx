@@ -45,7 +45,7 @@ const Swippercarrousel= ({cardRef,Candidatss,setSelectedcandidat,setParainer,Par
   Candidatss.candidats.map((candidat, index) => (
     <SwiperSlide key={index} className="relative h-full w-[60%]!">
       <CandidatCard 
-        userDetails={candidat} 
+        candidatDetails={candidat} 
         setSelectedcandidat={setSelectedcandidat} 
         setParainer={setParainer}  
         Parainer={Parainer} 
@@ -86,7 +86,7 @@ const SwipperCards= ({cardRef,Candidatss,setSelectedcandidat,setParainer,Paraine
   Candidatss.candidats.map((candidat, index) => (
     <SwiperSlide key={index} className="relative h-full w-[60%]!">
       <CandidatCard 
-        userDetails={candidat} 
+        candidatDetails={candidat} 
         setSelectedcandidat={setSelectedcandidat} 
         setParainer={setParainer}  
         Parainer={Parainer} 
@@ -139,6 +139,8 @@ const Swiper3DCarousel = ({mode,setParainer,setSelectedcandidat,Parainer,isconne
       if (!response.ok) throw new Error("Erreur lors de la récupération des candidats");
       console.log("connected to api")
       const data = await response.json();
+      console.log("donne",data)
+
       setCandidatss(data);
     } catch (err) {
       setError(err.message);
