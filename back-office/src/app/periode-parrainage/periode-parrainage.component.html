@@ -1,0 +1,12 @@
+<button (click)="back()">Back</button>
+
+<form class="periode_parrainage">
+    <div class="date_debut">
+        Date de Debut: <input type="date" [(ngModel)]="date_debut" [ngModelOptions]="{standalone: true}">
+    </div>
+    <div class="date_fin">
+        Date de Fin: <input type="date" [(ngModel)]="date_fin" [ngModelOptions]="{standalone: true}">
+    </div>
+
+    <button type="submit" (click)="Soumettre()">Soumettre</button>
+</form>

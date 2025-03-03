@@ -1,4 +1,6 @@
-<form>
+<button (click)="back()">Back</button>
+
+<form class="addCandidat">
     <div class="numCarte">
         Numero de la Carte d'Electeur: <input type="number" [(ngModel)]="numCarte" [ngModelOptions]="{standalone: true}">
     </div>
@@ -45,9 +47,33 @@
     </div>
 
     <div class="couleurParti" [hidden]="hiddenElecteur">
-        Couleur1: <input type="text" [(ngModel)]="couleurParti1" [ngModelOptions]="{standalone: true}">
-        Couleur2: <input type="text" [(ngModel)]="couleurParti2" [ngModelOptions]="{standalone: true}">
-        Couleur3: <input type="text" [(ngModel)]="couleurParti3" [ngModelOptions]="{standalone: true}">
+        Couleur1: <select type="text" [(ngModel)]="couleurParti1" [ngModelOptions]="{standalone: true}">
+            <option value="vert">vert</option>
+            <option value="jaune">jaune</option>
+            <option value="rouge">rouge</option>
+            <option value="noir">noir</option>
+            <option value="blanc">blanc</option>
+            <option value="viollet">viollet</option>
+            <option value="bleu">bleu</option>
+        </select>
+        Couleur2: <select type="text" [(ngModel)]="couleurParti2" [ngModelOptions]="{standalone: true}">
+            <option value="vert">vert</option>
+            <option value="jaune">jaune</option>
+            <option value="rouge">rouge</option>
+            <option value="noir">noir</option>
+            <option value="blanc">blanc</option>
+            <option value="viollet">viollet</option>
+            <option value="bleu">bleu</option>
+        </select>
+        Couleur3: <select type="text" [(ngModel)]="couleurParti3" [ngModelOptions]="{standalone: true}">
+            <option value="vert">vert</option>
+            <option value="jaune">jaune</option>
+            <option value="rouge">rouge</option>
+            <option value="noir">noir</option>
+            <option value="blanc">blanc</option>
+            <option value="viollet">viollet</option>
+            <option value="bleu">bleu</option>
+        </select>
     </div>
 
     <div class="URL" [hidden]="hiddenElecteur">
@@ -57,5 +83,3 @@
     <button type="submit" (click)="addCandidat()" [disabled]="false" [hidden]="hiddenElecteur">Soumettre</button>
 
 </form>
-
-<button (click)="back()">Back</button>

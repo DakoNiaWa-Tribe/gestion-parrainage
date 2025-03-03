@@ -1,0 +1,50 @@
+// Variables
+$primary-color: #007bff;
+$secondary-color: #f8f9fa;
+$accent-color: #343a40;
+$border-radius: 8px;
+$padding: 20px;
+$card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+// Conteneur principal
+.statistique {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: $padding;
+}
+
+// Style des cartes pour chaque modèle
+.candidat {
+  background-color: white;
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
+  margin: 15px;
+  padding: $padding;
+  width: 100%;
+  max-width: 350px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .nom,
+  .nomParti,
+  .total {
+    font-size: 16px;
+    color: $accent-color;
+    margin: 10px 0;
+  }
+
+  .nom {
+    font-weight: bold;
+  }
+
+  .total {
+    font-size: 18px;
+    font-weight: bold;
+    color: #28a745;
+  }
+}

@@ -9,23 +9,23 @@ export class ElecteurService{
 
     modelElecteurs : ModelElecteur[] = [
         new ModelElecteur(
-            123,
-            '',
-            'Dicko',
-            'Moussa Elhadji',
-            new Date(),
-            'Segou',
+            237529244,
+            '14781947380134900',
+            'Diop',
+            'Lamine',
+            new Date(1952, 9, 8),
+            'Touba',
             'M',
-            ''
+            '12'
         ),
         new ModelElecteur(
             100,
             '',
-            'Diallo',
-            'Fatoumata Welle',
+            'Gone',
+            'Ainz Owl',
             new Date(),
-            'Bamako',
-            'F',
+            '????',
+            'M',
             ''
         )
     ]

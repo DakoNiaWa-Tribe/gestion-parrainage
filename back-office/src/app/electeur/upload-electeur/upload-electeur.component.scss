@@ -1,0 +1,9 @@
+$primary-color: #9b34ae;
+
+.upload-electeur {
+    .upload-box {
+        border: 2px dashed $primary-color;
+        padding: 20px;
+        text-align: center;
+    }
+}
