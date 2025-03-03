@@ -20,6 +20,8 @@ CREATE TABLE parrain_electeurs (
     numero_tel VARCHAR(20) UNIQUE,
     email VARCHAR(100) UNIQUE,
     code_securite VARCHAR(15) UNIQUE,
+    code_otp VARCHAR(5) DEFAULT NULL,
+    voted TINYINT(1) DEFAULT 0, -- 0 did not voted -- 1 already voted
     date_enregistrement TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -228,11 +230,10 @@ CREATE TABLE etat_import (
     etat_upload_electeurs TINYINT NOT NULL DEFAULT 1,  -- 1 = Upload allowed, 0 = Upload blocked
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-CREATE TABLE `admin_users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(20) NOT NULL,
-  `password` varchar(50) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 |
+CREATE TABLE admin_users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username varchar(20) NOT NULL,
+  password varchar(50) NOT NULL,
+  name varchar(100) NOT NULL,
+  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
