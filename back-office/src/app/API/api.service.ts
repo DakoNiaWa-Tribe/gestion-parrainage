@@ -10,6 +10,8 @@ export class ApiService {
   constructor(private http: HttpClient) {}
   token = localStorage.getItem('token');
 
+
+
   // Méthode pour ajouter un candidat
   postCandidat(
     numero_electeur: number,
@@ -46,6 +48,8 @@ export class ApiService {
     return this.http.post(apiUrl, formData, { headers });
   }
 
+
+
   // Méthode pour afficher les candidats
   getCandidat(): Observable<any> {
     const apiUrl = 'https://backend-fast-api-i1g8.onrender.com/candidat/all';
@@ -58,12 +62,14 @@ export class ApiService {
     return this.http.get(apiUrl, { headers });
   }
 
+
+
   // Méthode pour uploader la liste des électeurs
   postUploadeElecteurs(file: File, checksum: string, userId: number): Observable<any> {
     const apiUrl = 'https://backend-fast-api-i1g8.onrender.com/admin/upload_electeur_csv';
 
     // Récupérer le token depuis le localStorage
-    const token = localStorage.getItem('token');
+    let token = localStorage.getItem('token');
 
     // Créer un FormData pour envoyer un fichier et des paramètres
     const formData = new FormData();
@@ -79,5 +85,22 @@ export class ApiService {
 
     // Envoyer la requête POST avec FormData
     return this.http.post(apiUrl, formData, { headers });
+  }
+
+
+
+  // Méthode pour afficher les statistiques par candidat
+  getStatistique(): Observable<any> {
+    const apiUrl = 'http://backend-fast-api-i1g8.onrender.com/admin/get_parrainage_statistiques';
+
+    // Récupérer le token depuis le localStorage
+    let token = localStorage.getItem('token');
+
+    const headers = new HttpHeaders({
+      'accept': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get(apiUrl, { headers });
   }
 }

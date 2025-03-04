@@ -5,20 +5,29 @@ import { DashboardService } from './dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss'
+  styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit{
-  constructor(private router: Router, private service: DashboardService){}
+export class DashboardComponent implements OnInit {
+  models: ModelDashboard[] = [];
 
-  models!: ModelDashboard[];
+  constructor(private router: Router, private service: DashboardService) {}
 
   ngOnInit(): void {
-    this.models = this.service.getdashboard();
+    // On s'abonne à l'observable retourné par le service pour récupérer les données
+    this.service.getDashboard().subscribe(
+      (data: ModelDashboard[]) => {
+        this.models = data; // On stocke les données dans la variable models
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération des données du dashboard', error);
+      }
+    );
   }
-  
+
+  // Méthode pour revenir à la page précédente ou à la Landing Page
   back(): void {
     this.router.navigateByUrl('LandingPage');
   }
 }
+
