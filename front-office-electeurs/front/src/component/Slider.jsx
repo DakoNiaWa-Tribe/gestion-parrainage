@@ -67,7 +67,7 @@ const SwipperCards= ({cardRef,Candidatss,setSelectedcandidat,setParainer,Paraine
 
     <>
     <Swiper
-    ref={cardRef}
+        ref={cardRef}
         effect="cards"
         grabCursor={true}
         centeredSlides={true}

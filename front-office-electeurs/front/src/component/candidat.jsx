@@ -67,10 +67,11 @@ const CandidatCard = ({ candidatDetails,setSelectedcandidat,setParainer,Parainer
       });
 
       const data = await response.json();
-
-      if (response.ok) {
+      console.log(data);
+      if (data.status_code === 200) {
         handleClick(candidatDetails);
       } else {
+        alert(data.message);
         console.error("Erreur de parrainage :", data.message);
       }
     } catch (err) {

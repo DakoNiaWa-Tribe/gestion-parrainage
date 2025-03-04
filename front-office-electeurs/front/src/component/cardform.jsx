@@ -41,8 +41,8 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
       });
 
       const data = await response.json();
-
-      if (response.ok) {
+      console.log("preinscrition:", data)
+      if (data[1] === 200) {
         setSuccess(true);
         setPart(!Part);
       } else {
@@ -71,7 +71,8 @@ const Preinscription = ({ isSignUp, handleToggleClick, formRef ,setPart, Part  ,
 
       const data = await response.json();
 
-      if (response.ok) {
+
+      if (data.status_code === 200 ) {
         console.log("response ok data: ",data.data[0])
         setSuccess(true);
         setElecteur(data.data[0]);
@@ -304,15 +305,15 @@ const InscriptionPart2 = ({formRef , formDatainscrip,setPart,Part }) => {
       });
 
       const data = await response.json();
+        console.log("inscrition:", data)
 
-      if (response.ok) {
+      if (data[1] === 200) {
         setSuccess(true);
         setTimeout(() => {
-          navigate('/login');
+          window.location.reload();
           setPart(!Part);
         }, 2000);
-
-        console.log("Inscription réussie !");
+        console.log("Inscription réussie part ",Part);
       } else {
         setError(data.message || "Échec de l'inscription.");
       }
@@ -442,8 +443,11 @@ const InscriptionPart2 = ({formRef , formDatainscrip,setPart,Part }) => {
         });
   
         const data = await response.json();
+
+        console.log("connection:", data)
+
   
-        if (response.ok) {
+        if (data.status_code === 200) {
           setSuccess(true);
           console.log("Authentification réussie !");
           setIsconnected(true);
@@ -521,10 +525,10 @@ const InscriptionPart2 = ({formRef , formDatainscrip,setPart,Part }) => {
     );
   };
 
-const Postinscription = ({formRef , Zone, userDetails, isconnected,setIsconnected ,Electeur, formDatainscrip}) => {
+const Postinscription = ({formRef , Zone, userDetails, isconnected,setIsconnected ,Electeur, formDatainscrip , Part,setPart}) => {
   return (
         <>
-          {Zone === "connexion" ? <Connectionpart2 formRef={formRef} userDetails={userDetails} isconnected={isconnected} setIsconnected={setIsconnected} Electeur={Electeur} /> : <InscriptionPart2 formRef={formRef} formDatainscrip={formDatainscrip} />}
+          {Zone === "connexion" ? <Connectionpart2 formRef={formRef} userDetails={userDetails} isconnected={isconnected} setIsconnected={setIsconnected} Electeur={Electeur} /> : <InscriptionPart2 formRef={formRef} formDatainscrip={formDatainscrip} setPart={setPart} Part={Part} />}
    
         </>
   );
@@ -625,7 +629,7 @@ const CardForm = ({isconnected,setIsconnected}) => {
         {part ? (
           <Preinscription isSignUp={isSignUp} handleToggleClick={handleToggleClick} formRef={formRef} setPart={setPart} Part={part}  setZone={setZone} Zone={Zone} Electeur={Electeur} setElecteur={setElecteur}  formDatainscrip={formDatainscrip} setFormDatainscrip={setFormDatainscrip} formDataconnexion={formDataconnexion} setFormDataconnexion={setFormDataconnexion}/>
         ) : (
-          <Postinscription formRef={formRef} Zone={Zone} isconnected={isconnected} setIsconnected={setIsconnected} formDatainscrip={formDatainscrip} Electeur={Electeur} userDetails={userDetails} />
+          <Postinscription formRef={formRef} Zone={Zone} isconnected={isconnected} setIsconnected={setIsconnected} formDatainscrip={formDatainscrip} Electeur={Electeur} userDetails={userDetails} setPart={setPart} Part={part}  />
         )}
          
       </div>
