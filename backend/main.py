@@ -7,7 +7,12 @@ app = FastAPI()
 # Ajouter le middleware CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200", "https://frontend-electeur.vercel.app"],  # Autorise uniquement localhost:4200 angualar et localhost:5173 react
+    allow_origins=[
+        "https://back-office-psi.vercel.app",
+        "https://frontend-electeur.vercel.app",
+        "http://localhost:3000",  # React app on local
+        "http://localhost:4200"
+    ],
     allow_credentials=True,
     allow_methods=["*"],  # Autorise toutes les méthodes (GET, POST, etc.)
     allow_headers=["*"],  # Autorise tous les en-têtes
