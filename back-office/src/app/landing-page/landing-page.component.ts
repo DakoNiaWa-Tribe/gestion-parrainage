@@ -21,4 +21,12 @@ export class LandingPageComponent {
   onParrainage(): void {
     this.router.navigateByUrl('Parrainage');
   }
+
+  onUploadElecteur(): void {
+    this.router.navigateByUrl('UploadElecteur');
+  }
+
+  onDashboard(): void {
+    this.router.navigateByUrl('Dashboard');
+  }
 }

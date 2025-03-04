@@ -1,0 +1,48 @@
+**Fiche Projet : Gestion des Parrainages Électoraux**
+
+**1. Introduction**
+Dans le cadre de la modernisation des processus électoraux au Sénégal, ce projet vise à digitaliser la gestion des parrainages pour les élections présidentielles. Actuellement, le processus de parrainage repose sur des documents papier, ce qui le rend complexe et sujet aux erreurs. La solution développée permettra d’automatiser cette gestion via une plateforme web et mobile.
+
+**2. Objectifs du Projet**
+- Développer une plateforme numérique permettant l’enregistrement, la validation et le suivi des parrainages.
+- Faciliter l’inscription des candidats et la gestion des électeurs parrains.
+- Mettre en place un système sécurisé de validation des électeurs et des parrainages.
+- Permettre aux administrateurs de superviser et contrôler l’ensemble du processus.
+
+**3. Fonctionnalités Principales**
+- **Gestion des électeurs** : Inscription, validation et suivi.
+- **Gestion des candidats** : Inscription des candidats par l’administrateur et affichage des informations.
+- **Système de parrainage** : Possibilité pour un électeur de parrainer un candidat après validation de son identité.
+- **Gestion des périodes de parrainage** : Ouverture et fermeture du processus par les administrateurs.
+- **Sécurité et validation** : Vérification des électeurs via des codes OTP et système de contrôle des données.
+- **Suivi et supervision** : Tableau de bord pour les administrateurs avec statistiques et rapports.
+
+**4. Technologies Utilisées**
+- **Backend** : Python avec FastApi et une base de données MySQL.
+- **Frontend** : Reactjs et Angular.
+- **Sécurité** : JWT pour l’authentification, validation des données avec des procédures stockées.
+- **Déploiement** : Hébergement cloud avec une base de données sécurisée.
+
+**5. Acteurs du Système**
+- **Électeurs** : Création de compte, parrainage d’un candidat.
+- **Candidats** : Visualisation des parrainages.
+- **Administrateurs (Admin_User)** : Supervision du processus, validation des candidats, gestion des périodes de parrainage.
+
+**6. Contraintes et Sécurité**
+- Respect des réglementations en vigueur sur la protection des données électorales.
+- Chiffrement des données sensibles (CNI, numéro électoral, etc.).
+- Mise en place de logs pour assurer la traçabilité des actions.
+
+**7. Livrables**
+- Code source documenté et versionné sur GitHub.
+- Base de données structurée et optimisée.
+- Interface utilisateur intuitive et responsive.
+- Rapport technique détaillé avec architecture, UML et captures d’écran.
+- Présentation PowerPoint pour la démonstration du projet.
+
+**8. Conclusion**
+Ce projet constitue une avancée majeure dans la numérisation du processus électoral en assurant fiabilité, transparence et accessibilité. Il facilitera la gestion des parrainages et réduira les risques de fraude et d’erreurs administratives.
+
+---
+
+Cette fiche peut être ajustée en fonction de tes besoins. Dis-moi si tu veux des modifications ! 😊

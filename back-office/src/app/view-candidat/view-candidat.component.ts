@@ -1,27 +1,33 @@
-import { ModelCandidat } from "../models/model-candidat"
+import { ModelCandidat } from "./model-viewCandidat";
 import { Component, OnInit } from '@angular/core';
-import { CandidatService } from '../services/candidat.service'
+import { CandidatService } from './viewCandidat.service';
 import { Router } from '@angular/router';
 
-
-
 @Component({
-  selector: 'viwe-candidat',
-  imports: [],
-  standalone: true,
+  selector: 'view-candidat',
   templateUrl: './view-candidat.component.html',
-  styleUrl: './view-candidat.component.scss'
+  styleUrls: ['./view-candidat.component.scss']
 })
 
-export class ViewCandidatComponent implements OnInit{
-    constructor(private service: CandidatService, private router: Router){}
-    models!: ModelCandidat[];
+export class ViewCandidatComponent implements OnInit {
+  constructor(private service: CandidatService, private router: Router) {}
+  
+  models!: ModelCandidat[];
 
-    ngOnInit(): void {
-        this.models = this.service.getcandidats();
-    }
-
-    back(): void {
-        this.router.navigateByUrl('');
+  ngOnInit(): void {
+    // S'abonner à l'observable pour récupérer les données
+    this.service.getcandidats().subscribe(
+      (candidats: ModelCandidat[]) => {
+        this.models = candidats;  // Assignation des candidats récupérés à la variable models
+        console.log('succes: ', candidats)
+      },
+      (error) => {
+        console.error('Erreur lors du chargement des candidats:', error);
       }
+    );
+  }
+
+  back(): void {
+    this.router.navigateByUrl('LandingPage');
+  }
 }
