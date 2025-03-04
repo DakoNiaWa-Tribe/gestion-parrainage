@@ -1,94 +1,128 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-export default function RajoutInfos() {
-  const [formData, setFormData] = useState({
-    email: "",
-    tel: "",
-    parti: "",
-    slogan: "",
-    colors: ["#000000", "#000000", "#000000"],
-    image: null,
-  });
+function RajoutInfos() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const candidat = location.state?.candidat; 
 
-  const apiUrl = "https://api.example.com/submit"; 
+    const [email, setEmail] = useState(""); 
+    const [telephone, setTelephone] = useState(""); 
+    const [nomParti, setNomParti] = useState(""); 
+    const [slogan, setSlogan] = useState(""); 
+    const [photo, setPhoto] = useState(null); 
+    const [couleurs, setCouleurs] = useState(["", "", ""]); 
+    const [errorMessage, setErrorMessage] = useState(""); 
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+    // Fonction de soumission du formulaire
+    const handleSubmit = async () => {
+        if (!email || !telephone || !nomParti || !slogan || !photo) {
+            setErrorMessage("Tous les champs doivent être remplis !");
+            return;
+        }
 
-  const handleColorChange = (index, value) => {
-    const newColors = [...formData.colors];
-    newColors[index] = value;
-    setFormData({ ...formData, colors: newColors });
-  };
+        // Création de l'objet FormData pour envoyer les données (y compris la photo)
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("telephone", telephone);
+        formData.append("nom_parti", nomParti);
+        formData.append("slogan", slogan);
+        formData.append("photo", photo);
+        formData.append("couleurs", JSON.stringify(couleurs));
+        formData.append("numero_candidat", candidat?.numeroCandidat); 
 
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, image: e.target.files[0] });
-  };
+        try {
+            const response = await fetch("https://backend-fast-api-i1g8.onrender.com/candidat/registration", {
+                method: "POST",
+                body: formData,
+            });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+            const data = await response.json();
 
-    const data = new FormData();
-    data.append("email", formData.email);
-    data.append("tel", formData.tel);
-    data.append("parti", formData.parti);
-    data.append("slogan", formData.slogan);
-    formData.colors.forEach((color, index) => {
-      data.append(`color${index + 1}`, color);
-    });
-    if (formData.image) {
-      data.append("image", formData.image);
-    }
+            if (response.ok) {
+                console.log("Candidat enregistré :", data);
+                navigate("/Enregistrement"); // Redirection après succès
+            } else {
+                setErrorMessage("Erreur lors de l'enregistrement : " + data.detail);
+            }
+        } catch (error) {
+            console.error("Erreur API :", error);
+            setErrorMessage("Problème de connexion avec le serveur.");
+        }
+    };
 
-    try {
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        body: data,
-      });
+    return (
+        <div className="cadre">
+            <h1>Informations complémentaires</h1>
 
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP : ${response.status}`);
-      }
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>} {/* Affichage de l'erreur */}
 
-      const result = await response.json();
-      console.log("Données envoyées avec succès :", result);
-    } catch (error) {
-      console.error("Erreur :", error);
-    }
-  };
+            <div>
+                <label>Email</label><br />
+                <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Entrez votre mail"
+                />
+            </div>
 
-  return (
-    <div className="cadre">
-      <h1>Informations complémentaires</h1>
-      <form onSubmit={handleSubmit}>
-        Email <br />
-        <input type="email" name="email" placeholder="Entrez votre mail" value={formData.email} onChange={handleChange} required />
+            <div>
+                <label>Téléphone</label><br />
+                <input
+                    type="tel"
+                    value={telephone}
+                    onChange={(e) => setTelephone(e.target.value)}
+                    placeholder="Entrez votre numéro de téléphone"
+                />
+            </div>
 
-        <br /> Téléphone <br />
-        <input type="tel" name="tel" placeholder="Entrez votre numéro de téléphone" value={formData.tel} onChange={handleChange} required />
+            <div>
+                <label>Nom du parti politique</label><br />
+                <textarea
+                    value={nomParti}
+                    onChange={(e) => setNomParti(e.target.value)}
+                    placeholder="Entrez le nom du parti"
+                />
+            </div>
 
-        <br /><br /> Nom du parti politique <br />
-        <textarea name="parti" placeholder="" value={formData.parti} onChange={handleChange} required />
+            <div>
+                <label>Slogan</label><br />
+                <textarea
+                    value={slogan}
+                    onChange={(e) => setSlogan(e.target.value)}
+                    placeholder="Cherchez à attirer l'attention de l'électeur"
+                />
+            </div>
 
-        <br /><br /> Slogan <br />
-        <textarea name="slogan" placeholder="Cherchez à attirer l'attention de l'électeur" value={formData.slogan} onChange={handleChange} required />
+            <div>
+                <label>Photo</label><br />
+                <input
+                    type="file"
+                    onChange={(e) => setPhoto(e.target.files[0])}
+                    accept="image/*"
+                />
+            </div>
 
-        <br /><br /> Photo <br />
-        <input type="file" name="image" accept="image/*" onChange={handleFileChange} required />
+            <div>
+                <label>Choisissez les trois couleurs de votre parti</label><br />
+                {couleurs.map((color, index) => (
+                    <input
+                        key={index}
+                        type="color"
+                        value={color}
+                        onChange={(e) => {
+                            const newColors = [...couleurs];
+                            newColors[index] = e.target.value;
+                            setCouleurs(newColors);
+                        }}
+                    />
+                ))}
+            </div>
 
-        <br /><br /> Choisissez les trois couleurs de votre parti <br />
-        {formData.colors.map((color, index) => (
-          <input key={index} type="color" value={color} onChange={(e) => handleColorChange(index, e.target.value)} />
-        ))}
-
-        <br /><br />
-        <Link to="/Enregistrement">
-        <button type="submit" className="linkButton">Valider</button></Link>
-      </form>
-    </div>
-  );
+            <button onClick={handleSubmit} className="linkButton">Valider</button>
+        </div>
+    );
 }
- 
+
+export default RajoutInfos;
