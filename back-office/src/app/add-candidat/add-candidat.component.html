@@ -1,0 +1,85 @@
+<button (click)="back()">Back</button>
+
+<form class="addCandidat">
+    <div class="numCarte">
+        Numero de la Carte d'Electeur: <input type="number" [(ngModel)]="numCarte" [ngModelOptions]="{standalone: true}">
+    </div>
+    <button (click)="Verifie()">OK</button>
+
+    <div class="electeurNonInscrit" [hidden]="hiddenElecteurCandidat">
+        <p>Le candidat considéré n'est pas présent dans le fichier électoral</p>
+    </div>
+
+    <div class="candidatInscrit" [hidden]="hiddenCandidat">
+        <p>Candidat déjà enregistré !</p>
+    </div>
+
+    <div class="nom" [hidden]="hiddenElecteur">
+        Nom: <input type="text" [(ngModel)]="nom" [ngModelOptions]="{standalone: true}">
+    </div>
+
+    <div class="prenom" [hidden]="hiddenElecteur">
+        Prenom: <input type="text" [(ngModel)]="prenom" [ngModelOptions]="{standalone: true}">
+    </div>
+
+    <div class="date" [hidden]="hiddenElecteur">
+        Date: <input type="date" [(ngModel)]="date" [ngModelOptions]="{standalone: true}">
+    </div>
+
+    <div class="mail" [hidden]="hiddenElecteur">
+        Mail: <input type="text" [(ngModel)]="mail" [ngModelOptions]="{standalone: true}">
+    </div>
+
+    <div class="numTel" [hidden]="hiddenElecteur">
+        Numero de Telephone<input type="tel" [(ngModel)]="numTel" [ngModelOptions]="{standalone: true}">
+    </div>
+
+    <div class="nomParti" [hidden]="hiddenElecteur">
+        Nom du Parti: <input type="text" [(ngModel)]="nomParti" [ngModelOptions]="{standalone: true}">
+    </div>
+
+    <div class="slogan" [hidden]="hiddenElecteur">
+        Slogan: <input type="text" [(ngModel)]="slogan" [ngModelOptions]="{standalone: true}">
+    </div>
+
+    <div class="photo" [hidden]="hiddenElecteur">
+        Photo: <input type="file" [(ngModel)]="photo" [ngModelOptions]="{standalone: true}">
+    </div>
+
+    <div class="couleurParti" [hidden]="hiddenElecteur">
+        Couleur1: <select type="text" [(ngModel)]="couleurParti1" [ngModelOptions]="{standalone: true}">
+            <option value="vert">vert</option>
+            <option value="jaune">jaune</option>
+            <option value="rouge">rouge</option>
+            <option value="noir">noir</option>
+            <option value="blanc">blanc</option>
+            <option value="viollet">viollet</option>
+            <option value="bleu">bleu</option>
+        </select>
+        Couleur2: <select type="text" [(ngModel)]="couleurParti2" [ngModelOptions]="{standalone: true}">
+            <option value="vert">vert</option>
+            <option value="jaune">jaune</option>
+            <option value="rouge">rouge</option>
+            <option value="noir">noir</option>
+            <option value="blanc">blanc</option>
+            <option value="viollet">viollet</option>
+            <option value="bleu">bleu</option>
+        </select>
+        Couleur3: <select type="text" [(ngModel)]="couleurParti3" [ngModelOptions]="{standalone: true}">
+            <option value="vert">vert</option>
+            <option value="jaune">jaune</option>
+            <option value="rouge">rouge</option>
+            <option value="noir">noir</option>
+            <option value="blanc">blanc</option>
+            <option value="viollet">viollet</option>
+            <option value="bleu">bleu</option>
+        </select>
+    </div>
+
+    <div class="URL" [hidden]="hiddenElecteur">
+        URL du site info: <input type="url" [(ngModel)]="URL" [ngModelOptions]="{standalone: true}">
+    </div>
+
+    <button type="submit" (click)="addCandidat()" [disabled]="false" [hidden]="hiddenElecteur">Soumettre</button>
+
+</form>

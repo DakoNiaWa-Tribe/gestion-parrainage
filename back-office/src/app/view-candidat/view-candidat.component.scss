@@ -1,0 +1,77 @@
+$primary-color: #9b34ae;
+
+.partiColors{
+    display: flex;
+    width: 180px;
+    height: 90px;
+}
+
+.couleur{
+    flex: 1;
+    height: 100%;
+}
+
+.vert{
+    background-color: green;
+}
+.jaune{
+    background-color: yellow;
+}
+
+.rouge{
+    background-color: red;
+}
+
+.noir{
+    background-color: black;
+}
+
+.blanc{
+    background-color: white;
+}
+
+.viollet{
+    background-color: purple;
+}
+
+.bleu{
+    background-color: blue;
+}
+
+
+
+/*.candidat{
+    box-sizing: border-box;
+    margin: 20px auto;
+    padding: 10px 30px;
+    box-shadow: gray 2px 2px 10px;
+}*/
+
+.viewCandidat {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+  
+    .candidat {
+      background-color: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 300px;
+  
+      img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+      }
+  
+      h3 {
+        margin: 10px 0;
+        color: $primary-color;
+      }
+    }
+  }

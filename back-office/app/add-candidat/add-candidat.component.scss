@@ -1,0 +1,17 @@
+$secondary-color: #6c757d;
+
+.addCandidat {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid $secondary-color;
+    border-radius: 4px;
+}

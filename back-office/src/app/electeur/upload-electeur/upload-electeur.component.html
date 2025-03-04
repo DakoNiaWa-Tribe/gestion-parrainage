@@ -1,0 +1,27 @@
+<button (click)="back()">Back</button>
+
+<div class="upload-electeur">
+    <h2>Importation de la liste des électeurs</h2>
+    <form [formGroup]="importForm" class="upload-box">
+      
+      <!-- Sélection du fichier -->
+      <div class="form-group">
+        <label for="file">Sélectionner un fichier CSV :</label>
+        <input type="file" id="file" (change)="onFileSelected($event)" accept=".csv" class="form-control" />
+      </div>
+  
+      <!-- Affichage du fichier et de l'empreinte -->
+      <div *ngIf="fileName">
+        <p><strong>Fichier sélectionné: </strong> {{ fileName }}</p>
+        <p><strong>Empreinte SHA-256: </strong> {{ fileHash }}</p>
+      </div>
+  
+      <!-- Champ pour l'empreinte SHA-256 -->
+      <div class="form-group">
+        <label for="checksum">Empreinte SHA-256: </label>
+        <input type="text" id="checksum" formControlName="checksum" class="form-control" readonly />
+      </div>
+  
+      <button type="submit" class="Importer" (click)="onSubmit()">Exporter</button>
+    </form>
+</div>

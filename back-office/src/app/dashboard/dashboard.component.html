@@ -1,0 +1,11 @@
+<button (click)="back()">Back</button>
+
+<div class="statistique">
+    @for (model of models; track model.numCarte) {
+        <div class="candidat">
+            <p class="nom">Nom Complet: {{model.prenom}} {{model.nom}}</p>
+            <p class="nomParti">Nom du Parti: {{model.nomParti}}</p>
+            <p class="total">Nombre Total de parrainage: {{model.totalParainage}}</p>
+        </div>
+    }    
+</div>
