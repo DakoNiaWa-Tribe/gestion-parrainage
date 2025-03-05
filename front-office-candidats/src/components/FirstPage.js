@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 function FirstPage() {
     const [numeroElecteur, setNumeroElecteur] = useState(""); 
+    const [codeSecurite, setCodeSecurite] = useState("");
     const [errorMessage, setErrorMessage] = useState(""); 
     const navigate = useNavigate(); 
 
@@ -26,8 +27,9 @@ function FirstPage() {
             console.log("Réponse API :", data);
 
             if (response.ok) {
+                localStorage.setItem("userDetails", JSON.stringify(data));
                 console.log("Candidat trouvé :", data);
-                navigate("/RajoutInfos", { state: { candidat: data } }); 
+                navigate("/Statistiques", { state: { candidat: data } }); 
             } else {
                 setErrorMessage(data.detail || "Numéro incorrect ou candidat déjà enregistré.");
             }
@@ -50,8 +52,16 @@ function FirstPage() {
                 />
             </div>
 
-            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>} 
+            <div className="div1">
+                <label>Entrez le code de sécurité envoyé par mail :</label>
+                <input 
+                    type="text"
+                    value={codeSecurite}
+                    onChange={(e) => setCodeSecurite(e.target.value)}
+                />
 
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>} 
+            </div>
             <div>
                 <button onClick={checkElecteur} className="linkButton">Enregistrer</button>
             </div>
