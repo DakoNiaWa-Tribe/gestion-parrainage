@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
+
   constructor(private authService: AuthService, private router: Router) {}
 
   username = '';
@@ -20,7 +21,7 @@ export class LoginComponent {
     let username = this.username;
     let password = this.password;
     this.authService.login(username, password).subscribe(response => {
-      const token = response.access_token; // Supposons que le token soit retourné dans "token"
+      let token = response.access_token; // Supposons que le token soit retourné dans "token"
       localStorage.setItem('token', token);  // Stocke le token dans localStorage
       console.log('Token stocké avec succès !');
       this.router.navigateByUrl('LandingPage')
