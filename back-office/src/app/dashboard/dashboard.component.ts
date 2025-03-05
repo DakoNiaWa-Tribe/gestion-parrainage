@@ -2,13 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModelDashboard } from './model-dashboard';
 import { DashboardService } from './dashboard.service';
+import { LoaderComponent } from '../loader/loader.component'
+import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
+  imports: [
+    LoaderComponent,
+    CommonModule
+  ]
 })
 export class DashboardComponent implements OnInit {
+  loading: boolean = true;
+
   models: ModelDashboard[] = [];
 
   constructor(private router: Router, private service: DashboardService) {}
@@ -18,6 +27,7 @@ export class DashboardComponent implements OnInit {
     this.service.getDashboard().subscribe(
       (data: ModelDashboard[]) => {
         this.models = data; // On stocke les données dans la variable models
+        this.loading = false;
       },
       (error) => {
         console.error('Erreur lors de la récupération des données du dashboard', error);

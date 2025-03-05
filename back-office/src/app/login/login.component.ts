@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
+
   constructor(private authService: AuthService, private router: Router) {}
 
   username = '';

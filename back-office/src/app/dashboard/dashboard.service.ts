@@ -19,7 +19,7 @@ export class DashboardService {
     let token = localStorage.getItem('token');
     const headers = new HttpHeaders({
       'accept': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
     });
 
     return new Observable((observer) => {
