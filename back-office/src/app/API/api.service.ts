@@ -86,21 +86,4 @@ export class ApiService {
     // Envoyer la requête POST avec FormData
     return this.http.post(apiUrl, formData, { headers });
   }
-
-
-
-  // Méthode pour afficher les statistiques par candidat
-  getStatistique(): Observable<any> {
-    const apiUrl = 'http://backend-fast-api-i1g8.onrender.com/admin/get_parrainage_statistiques';
-
-    // Récupérer le token depuis le localStorage
-    let token = localStorage.getItem('token');
-
-    const headers = new HttpHeaders({
-      'accept': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.http.get(apiUrl, { headers });
-  }
 }

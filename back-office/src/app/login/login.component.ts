@@ -23,7 +23,6 @@ export class LoginComponent {
       let token = response.access_token; // Supposons que le token soit retourné dans "token"
       localStorage.setItem('token', token);  // Stocke le token dans localStorage
       console.log('Token stocké avec succès !');
-      alert(response.access_token);
       this.router.navigateByUrl('LandingPage')
     }, error => {
       console.error('Erreur de connexion', error);
