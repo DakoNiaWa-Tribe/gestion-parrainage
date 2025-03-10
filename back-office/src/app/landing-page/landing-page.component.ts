@@ -29,4 +29,9 @@ export class LandingPageComponent {
   onDashboard(): void {
     this.router.navigateByUrl('Dashboard');
   }
+
+  onDisconnect(): void{
+    localStorage.clear();
+    this.router.navigateByUrl('');
+  }
 }
