@@ -11,27 +11,27 @@ export class LandingPageComponent {
   constructor(private router: Router){}
 
   onAddCandidat(): void {
-    this.router.navigateByUrl('AddCandidat');
+    this.router.navigateByUrl('AddCandidat', { replaceUrl: true });
   }
 
   onViewCandidat(): void {
-    this.router.navigateByUrl('ViewCandidat');
+    this.router.navigateByUrl('ViewCandidat', { replaceUrl: true });
   }
 
   onParrainage(): void {
-    this.router.navigateByUrl('Parrainage');
+    this.router.navigateByUrl('Parrainage', { replaceUrl: true });
   }
 
   onUploadElecteur(): void {
-    this.router.navigateByUrl('UploadElecteur');
+    this.router.navigateByUrl('UploadElecteur', { replaceUrl: true });
   }
 
   onDashboard(): void {
-    this.router.navigateByUrl('Dashboard');
+    this.router.navigateByUrl('Dashboard', { replaceUrl: true });
   }
 
   onDisconnect(): void{
     localStorage.clear();
-    this.router.navigateByUrl('');
+    this.router.navigateByUrl('', { replaceUrl: true });
   }
 }

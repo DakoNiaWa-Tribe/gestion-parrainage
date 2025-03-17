@@ -1,11 +1,12 @@
 <button (click)="back()">Back</button>
 
-<div class="viewCandidat">
+<div class="viewCandidat" *ngIf="models && models.length > 0; else emptyMessage">
     @for (model of models; track model.numCarte) {
         <div class="candidat">
             <p class="numCarte">Numero de Carte: {{model.numCarte}}</p>
             <p class="nom">Nom: {{model.nom}}</p>
             <p class="prenom">Prenom: {{model.prenom}}</p>
+            <p class="age">Age: {{model.age}}</p>
             <p class="date">Date de Naissance: {{model.date}}</p>
             <p class="mail">Mail: {{model.mail}}</p>
             <p class="numTel">Numero de Telephone: +221 {{model.numTel}}</p>
@@ -24,3 +25,9 @@
 
 <!-- Affichage du loader -->
 <app-loader *ngIf="loading"/>
+
+<!-- Affichage du Message d'erreur en cas d'indisponibilite de contenu -->
+<ng-template #emptyMessage>
+    <div class="emptyMessage">Informations sur les candidats indisponibles</div>
+</ng-template>
+ 

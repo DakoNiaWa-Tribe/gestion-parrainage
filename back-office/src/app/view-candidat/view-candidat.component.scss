@@ -30,7 +30,7 @@ $primary-color: #9b34ae;
     background-color: white;
 }
 
-.viollet{
+.violet{
     background-color: purple;
 }
 
@@ -38,6 +38,33 @@ $primary-color: #9b34ae;
     background-color: blue;
 }
 
+.cyan{
+    background-color: cyan;
+}
+
+.magenta{
+    background-color: magenta;
+}
+
+.orange{
+    background-color: orange;
+}
+
+.gris{
+    background-color: gray;
+}
+
+.rose{
+    background-color: pink;
+}
+
+.marron{
+    background-color: brown;
+}
+
+.turquoise{
+    background-color: turquoise;
+}
 
 
 /*.candidat{
@@ -74,4 +101,12 @@ $primary-color: #9b34ae;
         color: $primary-color;
       }
     }
-  }
+}
+
+.emptyMessage {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    color: black;
+    margin: 20px 0;
+}

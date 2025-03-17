@@ -117,6 +117,6 @@ export class AddCandidatComponent implements OnInit {
     }
 
     back(): void {
-      this.router.navigateByUrl('LandingPage');
+      this.router.navigateByUrl('LandingPage', { replaceUrl: true });
     }
 }

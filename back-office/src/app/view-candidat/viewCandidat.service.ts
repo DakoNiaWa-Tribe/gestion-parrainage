@@ -38,7 +38,8 @@ export class CandidatService {
                                 candidat.couleur_parti_1,
                                 candidat.couleur_parti_2,
                                 candidat.couleur_parti_3,
-                                candidat.page_info_url
+                                candidat.page_info_url,
+                                candidat.age
                             );
     
                             // Ajoute le candidat transformé au tableau

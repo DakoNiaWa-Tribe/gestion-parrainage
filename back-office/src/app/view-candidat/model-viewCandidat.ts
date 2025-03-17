@@ -14,5 +14,6 @@ export class ModelCandidat{
         public couleurParti2 : string,
         public couleurParti3 : string,
         public URL : string,
+        public age : number
     ){}
 }

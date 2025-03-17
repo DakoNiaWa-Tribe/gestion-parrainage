@@ -1,6 +1,6 @@
 <button (click)="back()">Back</button>
 
-<div class="statistique">
+<div class="statistique" *ngIf="models && models.length > 0; else emptyMessage">
     @for (model of models; track model.nom) {
         <div class="candidat">
             <p class="nom">Nom Complet: {{model.prenom}} {{model.nom}}</p>
@@ -12,3 +12,8 @@
 
 <!-- Affichage du loader -->
 <app-loader *ngIf="loading"/>
+
+<!-- Affichage du Message d'erreur en cas d'indisponibilite de contenu -->
+<ng-template #emptyMessage>
+    <div class="emptyMessage">Statistique indisponible ou Token expire</div>
+</ng-template>

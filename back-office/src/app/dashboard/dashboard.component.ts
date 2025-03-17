@@ -37,7 +37,7 @@ export class DashboardComponent implements OnInit {
 
   // Méthode pour revenir à la page précédente ou à la Landing Page
   back(): void {
-    this.router.navigateByUrl('LandingPage');
+    this.router.navigateByUrl('LandingPage', { replaceUrl: true });
   }
 }
 
